@@ -19,6 +19,16 @@ class Buff(models.Model):
     name = models.TextField()
     value = models.FloatField()
 
+    @property
+    def value_adj(self):
+        if self.short == 'spooky':
+            if now().month == 10:
+                return self.value
+            else:
+                return 0
+        else:
+            return self.value
+
     def __str__(self):
         if self.value < 0:
             return f"-{self.short}"
@@ -70,7 +80,7 @@ class MovieSuggestion(models.Model):
     def get_score(self):
         try:
             buff_score = sum(
-                [buff.value for buff in self.buffs.all()]
+                [buff.value_adj for buff in self.buffs.all()]
             )  # could be in db.
             if self.year < 1990:
                 year_debuff = -1

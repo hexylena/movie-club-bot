@@ -695,7 +695,7 @@ class Command(BaseCommand):
                 response = openai.Completion.create(
                     model=model,
                     prompt=message.text[len(short) + 1 :],
-                    temperature=0.7,
+                    temperature=1.1,
                     max_tokens=512,
                     top_p=1,
                     frequency_penalty=0,

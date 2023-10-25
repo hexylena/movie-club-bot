@@ -2,7 +2,7 @@
   "scripts": {
     "dokku": {
       "predeploy": "python manage.py migrate --noinput",
-      "postdeploy": "python manage.py upgrade_users"
+      "postdeploy": "python manage.py upgrade_users; python manage.py fetch_imdb"
     }
   }
 }

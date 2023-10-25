@@ -52,6 +52,8 @@ class MovieSuggestion(models.Model):
     meta = models.TextField(null=True)
 
     added = models.DateTimeField(auto_now_add=True)
+    # When was it last updated from IMDB, may be null
+    imdb_update = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     # Our info
     status = models.IntegerField()
@@ -198,6 +200,7 @@ class MovieSuggestion(models.Model):
         self.runtime = r_s
         self.genre = g_s
         self.meta = json.dumps(movie_details)
+        self.imdb_update = now()
         self.save()
 
     @classmethod

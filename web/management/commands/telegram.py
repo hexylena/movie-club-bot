@@ -552,7 +552,7 @@ class Command(BaseCommand):
 
     def dalle(self, query, message, tennant_id):
         try:
-            response = openai.Image.create(prompt=query, n=1, size="512x512")
+            response = openai.Image.create(prompt=query, model="dall-e-3", n=1, size="1024x1024")
             image_url = response["data"][0]["url"]
             zz = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
             zz.close()

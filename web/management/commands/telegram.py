@@ -479,21 +479,21 @@ class Command(BaseCommand):
         import pprint
         pprint.pprint(completion)
 
-        msg = completion["choices"][0]["message"]
+        msg = completion.choices[0].message
         # Check if it's a function call
         function = None
         function_args = {}
         if 'function_call' in msg:
-            function = msg['function_call']['name']
+            function = msg.function_call.name
             # Note: the JSON response from the model may not be valid JSON
             try:
-                function_args = json.loads(msg['function_call']['arguments'])
+                function_args = json.loads(msg.function_call.arguments)
             except:
                 function = None
         print(f"CALLING FUNCTION {function} with {function_args}")
 
         if function is None:
-            gpt3_text = msg["content"]
+            gpt3_text = msg.content
 
             # Setup if empty
             if tennant_id not in self.previous_messages:
@@ -501,7 +501,7 @@ class Command(BaseCommand):
 
             # Add the user's query
             self.add_context({"role": "user", "content": query}, tennant_id)
-            self.add_context(msg, tennant_id)
+            self.add_context({"role": "assistant", "content": msg.content}, tennant_id)
             u = f"[{completion['usage']['prompt_tokens']}/{completion['usage']['completion_tokens']}/{c1-c0:0.2f}]"
             bot.send_message(message.chat.id, gpt3_text.strip() + f"\n\n{u}")
         else:
@@ -517,7 +517,7 @@ class Command(BaseCommand):
                 {"role": "system", "content": prompt}
             ] + self.previous_messages.get(tennant_id, []) + [
                 {"role": "user", "content": query},
-                msg,
+                {"role": "assistant", "content": msg.content},
                 {
                     "role": "function",
                     "name": function,
@@ -530,15 +530,18 @@ class Command(BaseCommand):
             )
             c2 = time.time()
 
-            gpt3_text = second_response['choices'][0]['message']['content']
+            gpt3_text = second_response.choices[0].message.content
             # Setup if empty
             if tennant_id not in self.previous_messages:
                 self.previous_messages[tennant_id] = []
 
             self.add_context({"role": "user", "content": query}, tennant_id)
-            self.add_context(second_response['choices'][0]['message'], tennant_id)
-            u = f"[{completion['usage']['prompt_tokens']}/{completion['usage']['completion_tokens']}/{c1-c0:0.2f}]"
-            u2 = f"[{second_response['usage']['prompt_tokens']}/{second_response['usage']['completion_tokens']}/{c2-c1:0.2f}]"
+            self.add_context({
+                "role": "assistant",
+                "content": second_response.choices[0].message.content
+            }, tennant_id)
+            u = f"[{completion.usage.prompt_tokens}/{completion.usage.completion_tokens}/{c1-c0:0.2f}]"
+            u2 = f"[{second_response.usage.prompt_tokens}/{second_response.usage.completion_tokens}/{c2-c1:0.2f}]"
             bot.send_message(message.chat.id, gpt3_text.strip() + f"\n\n{u}\n{u2}")
 
             return 
@@ -556,7 +559,7 @@ class Command(BaseCommand):
     def dalle(self, query, message, tennant_id):
         try:
             response = client.images.generate(prompt=query, model="dall-e-3", n=1, size="1024x1024")
-            image_url = response["data"][0]["url"]
+            image_url = response.data[0].url
             zz = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
             zz.close()
             img_data = requests.get(image_url).content
@@ -577,11 +580,13 @@ class Command(BaseCommand):
             + [{"role": "user", "content": prompt_dalle}]
         )
         messages = self.filter_for_size(messages)
+        print("DALLE CONTEXT")
+        print(messages)
         completion = client.chat.completions.create(
             model="gpt-3.5-turbo-0613", messages=messages
         )
-        msg = completion.to_dict()["choices"][0]["message"]
-        gpt3_text = msg["content"]
+        msg = completion.choices[0].message
+        gpt3_text = msg.content
         image_prompt = gpt3_text.replace('Text: ', '')
         self.dalle(image_prompt, message, tennant_id)
         bot.send_message(
@@ -704,7 +709,7 @@ class Command(BaseCommand):
                     frequency_penalty=0,
                     presence_penalty=0,
                 )
-                gpt3_text = response.to_dict()["choices"][0].text
+                gpt3_text = response.choices[0].message.content
                 bot.reply_to(
                     message, "Prompt: " + message.text[len(short) + 1 :] + gpt3_text
                 )

@@ -31,8 +31,11 @@ import requests
 import telebot
 import openai
 
+client = OpenAI(
+    api_key=os.environ['OPENAI_API_KEY']
+)
+
 bot = telebot.TeleBot(os.environ["TELOXIDE_TOKEN"])
-openai.api_key = os.getenv("OPENAI_API_KEY")
 imdb_link = re.compile("imdb.com/title/(tt[0-9]*)/?")
 MOVIE_VIEW = Permission.objects.get(name="Can view movie suggestion")
 MOVIE_ADD = Permission.objects.get(name="Can add movie suggestion")
@@ -469,7 +472,7 @@ class Command(BaseCommand):
         messages = self.filter_for_size(messages)
 
         c0 = time.time()
-        completion = openai.ChatCompletion.create(
+        completion = client.chat.completions.create(
             model="gpt-3.5-turbo-0613", messages=messages, functions=self.discover()
         )
         c1 = time.time()
@@ -521,7 +524,7 @@ class Command(BaseCommand):
                     "content": result,
                 }
             ]
-            second_response = openai.ChatCompletion.create(
+            second_response = client.chat.completions.create(
                 model="gpt-3.5-turbo-0613",
                 messages=final_messages,
             )
@@ -552,13 +555,13 @@ class Command(BaseCommand):
 
     def dalle(self, query, message, tennant_id):
         try:
-            response = openai.Image.create(prompt=query, model="dall-e-3", n=1, size="1024x1024")
+            response = client.images.generate(prompt=query, model="dall-e-3", n=1, size="1024x1024")
             image_url = response["data"][0]["url"]
             zz = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
             zz.close()
             img_data = requests.get(image_url).content
             bot.send_photo(message.chat.id, img_data)
-        except openai.error.InvalidRequestError as ire:
+        except Exception as ire:
             bot.send_message(
                 message.chat.id,
                 f"{ire}\nQuery: {query}"
@@ -574,7 +577,7 @@ class Command(BaseCommand):
             + [{"role": "user", "content": prompt_dalle}]
         )
         messages = self.filter_for_size(messages)
-        completion = openai.ChatCompletion.create(
+        completion = client.chat.completions.create(
             model="gpt-3.5-turbo-0613", messages=messages
         )
         msg = completion.to_dict()["choices"][0]["message"]
@@ -692,7 +695,7 @@ class Command(BaseCommand):
             if model.startswith("gpt-3.5-turbo"):
                 self.chatgpt(message.text[len(short) + 1 :], message, tennant_id)
             else:
-                response = openai.Completion.create(
+                response = client.chat.completions.create(
                     model=model,
                     prompt=message.text[len(short) + 1 :],
                     temperature=1.1,

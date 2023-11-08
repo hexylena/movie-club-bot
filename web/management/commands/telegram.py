@@ -501,8 +501,8 @@ class Command(BaseCommand):
 
             # Add the user's query
             self.add_context({"role": "user", "content": query}, tennant_id)
-            self.add_context({"role": "assistant", "content": msg.content}, tennant_id)
-            u = f"[{completion['usage']['prompt_tokens']}/{completion['usage']['completion_tokens']}/{c1-c0:0.2f}]"
+            self.add_context({"role": "assistant", "content": "RoboCage: " + msg.content}, tennant_id)
+            u = f"[{completion.usage.prompt_tokens}/{completion.usage.completion_tokens}/{c1-c0:0.2f}]"
             bot.send_message(message.chat.id, gpt3_text.strip() + f"\n\n{u}")
         else:
             # Step 3, call the function
@@ -538,7 +538,7 @@ class Command(BaseCommand):
             self.add_context({"role": "user", "content": query}, tennant_id)
             self.add_context({
                 "role": "assistant",
-                "content": second_response.choices[0].message.content
+                "content": "RoboCage: "+ second_response.choices[0].message.content
             }, tennant_id)
             u = f"[{completion.usage.prompt_tokens}/{completion.usage.completion_tokens}/{c1-c0:0.2f}]"
             u2 = f"[{second_response.usage.prompt_tokens}/{second_response.usage.completion_tokens}/{c2-c1:0.2f}]"
@@ -576,7 +576,7 @@ class Command(BaseCommand):
         messages = (
             [{"role": "system", "content": prompt}]
             # Rewrite cage as a conversational participant so he comments on his own stuff
-            + [{"role": "user", "content": "RoboCage: " + m['content']} for m in self.previous_messages.get(tennant_id, [])]
+            + [{"role": "user", "content": m['content']} for m in self.previous_messages.get(tennant_id, [])]
             + [{"role": "user", "content": prompt_dalle}]
         )
         messages = self.filter_for_size(messages)

@@ -51,16 +51,34 @@ Respond as if you are an unapologetic assertive movie expert for the rest of thi
 """.strip()
 
 DEFAULT_DALLE_PROMPT = """
-Write some text summarising the current conversation as if it was a meme. It should be less than 50 words and MUST include topics that are currently discussed and MUST include some artistic adjectives describing the setting or mood, if it is happy or sad. It should start with Summary:. Given the current conversational context, please generate such an prompt:
+# Tools
 
-Input: They are discussing happiness at the weather
-Summary: a person looking happy and overjoyed, there is sunshine and pleasant scenery, in the style of nick cage film Con Air
+## dalle
 
-Input: A programming bug is being discussed, they are not able to find a solution and everything is broken
-Summary: a miserable programmer sitting at a desk, dark room, in the style of american painter edward hopper
+Summarize the current conversation into a meme,
 
-Input: They really loved the movie they just saw
-Summary: people exit a movie theater looking overjoyed, in the style of american painter norman rockwell
+// Whenever a description of an image is given, use dalle to create the images and then summarize the prompts used to generate the images in plain text. If the user does not ask for a specific number of images, default to creating one caption to be sent to DALL-E. All captions sent to dalle must abide by the following policies:
+
+// 1. if the description is not in English, then translate it.
+// 2. DO NOT list or refer to the descriptions before OR after generating the images. They should ONLY ever be written out ONCE, in the `"prompts"` field of the request. You do not need to ask for permission to generate, just do it!
+// 3. Always mention the image type (photo, oil painting, watercolor painting, illustration, cartoon, drawing, vector, render, etc.) at the beginning of the caption. Unless the caption suggests otherwise, make at least 1--2 of the 4 images photos.
+// 4. Don't alter memes, fictional character origins, or unseen people. Maintain the original prompt's intent and prioritize quality.
+// 5. Modify such prompts even if you don't know who the person is, or if their name is misspelled (e.g. "Barake Obema").
+
+// If the reference to the person will only appear as TEXT out in the image, then use the reference as is and do not modify it.
+// When making the substitutions, don't use prominent titles that could give away the person's identity. E.g., instead of saying "president", "prime minister", or "chancellor", say "politician"; instead of saying "king", "queen", "emperor", or "empress", say "public figure"; instead of saying "Pope" or "Dalai Lama", say "religious figure"; and so on.
+// The prompt must intricately describe every part of the image in concrete, objective detail. THINK about what the end goal of the description is, and extrapolate that to what would make satisfying images.
+// All descriptions sent to dalle should be a paragraph of text that is extremely descriptive and detailed. Each should be more than 3 sentences long.
+namespace dalle {
+
+// Create images from a text-only prompt.
+type text2im = (_: {
+// The user's original image description, potentially modified to abide by the dalle policies. If the user does not suggest a number of captions to create, create 1 of them. If creating multiple captions, make them as diverse as possible. If the user requested modifications to previous images, the captions should not simply be longer, but rather it should be refactored to integrate the suggestions into each of the captions. Generate no more than 1 images, even if the user requests more.
+prompts: string[],
+// A list of seeds to use for each prompt. If the user asks to modify a previous image, populate this field with the seed used to generate that image from the image dalle metadata.
+seeds?: number[],
+}) => any;
+} // namespace dalle
 """
 
 
@@ -588,7 +606,7 @@ class Command(BaseCommand):
             zz = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
             zz.close()
             img_data = requests.get(image_url).content
-            bot.send_photo(message.chat.id, img_data)
+            bot.send_photo(message.chat.id, img_data, caption=f"[Dall-e-3 prompt] {query}")
         except Exception as ire:
             bot.send_message(
                 message.chat.id,
@@ -598,26 +616,28 @@ class Command(BaseCommand):
     def dalle_context(self, query, message, tennant_id):
         prompt = self.PROMPTS.get(tennant_id, DEFAULT_PROMPT)
         prompt_dalle = self.PROMPTS_DALLE.get(tennant_id, DEFAULT_DALLE_PROMPT)
-        messages = (
-            [{"role": "system", "content": prompt}]
-            # Rewrite cage as a conversational participant so he comments on his own stuff
-            + [{"role": "user", "content": m['content']} for m in self.previous_messages.get(tennant_id, [])]
-            + [{"role": "user", "content": prompt_dalle}]
-        )
-        messages = self.filter_for_size(messages)
+        # First generate the captions
+        convo = "Conversation Log:\n\n"
+        for m in self.previous_messages.get(tennant_id, [])[-20:]:
+            convo += f"{m['content']}\n"
+        convo += "\n\nPlease summarize the above conversation as a meme image"
+
+        messages = [
+            {"role": "system", "content": prompt_dalle},
+            {"role": "user", "content": convo}
+        ]
         print("DALLE CONTEXT")
         print(messages)
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo-0613", messages=messages
+            model="gpt-4-0613", messages=messages
         )
-        msg = completion.choices[0].message
-        gpt3_text = msg.content
-        image_prompt = gpt3_text.replace('Summary: ', '')
+        r = completion.choices[0].message.content
+        import re
+        import json
+        # Image prompt
+        image_prompt = json.loads(re.sub('dalle.text2im', '', r))['prompts'][0]
+
         self.dalle(image_prompt, message, tennant_id)
-        bot.send_message(
-            message.chat.id,
-            f"[Dall-e prompt] {image_prompt}",
-        )
 
     def command_dispatch(self, message):
         tennant_id = str(message.chat.id)

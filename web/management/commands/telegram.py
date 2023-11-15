@@ -567,6 +567,7 @@ class Command(BaseCommand):
                     "content": result,
                 }
             ]
+            print(final_messages)
             second_response = client.chat.completions.create(
                 model="gpt-3.5-turbo-0613",
                 messages=final_messages,

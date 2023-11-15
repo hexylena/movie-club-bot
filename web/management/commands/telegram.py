@@ -360,6 +360,31 @@ class Command(BaseCommand):
         films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
         # self.chatgpt("Hey nick we're thinking of watching one of these three films: {films}. Which do you recommend and why?", message, str(message.chat.id))
 
+    def suggest_nojj(self, message):
+        unwatched = sorted(
+            MovieSuggestion.objects.filter(
+                tennant_id=str(message.chat.id), status=0,
+            ),
+            key=lambda x: -x.get_score,
+        )
+        jj = User.objects.get(username="824932139")
+        unwatched = [
+            x for x in unwatched
+            if jj not in [y.user for y in x.interest_set.all()]
+        ][0:3]
+        msg = "Top 3 films to watch without JJ:\n\n"
+        for film in unwatched:
+            msg += f"{film.title} ({film.year})\n"
+            msg += f"  ⭐️{film.rating}\n"
+            msg += f"  ⏰{film.runtime}\n"
+            msg += f"  🎬{film.imdb_link}\n"
+            if len(film.get_buffs) > 0:
+                msg += f"  🎟{film.get_buffs}\n"
+            msg += f"  📕{film.genre}\n\n"
+        bot.send_message(message.chat.id, msg)
+
+        films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
+
     def process_imdb_links(self, message):
         tennant_id = str(message.chat.id)
         new_count = 0
@@ -663,6 +688,9 @@ class Command(BaseCommand):
         elif message.text.startswith("/suggest"):
             self.log(tennant_id, "suggest")
             self.suggest(message)
+        elif message.text.startswith("/suggestnojj"):
+            self.log(tennant_id, "suggestnojj")
+            self.suggest_nojj(message)
         elif message.text.startswith("/update"):
             self.log(tennant_id, "update")
             self.update_imdb_meta(message)

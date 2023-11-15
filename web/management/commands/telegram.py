@@ -635,7 +635,7 @@ class Command(BaseCommand):
         import re
         import json
         # Image prompt
-        image_prompt = json.loads(re.sub('dalle.text2im', '', r))['prompts'][0]
+        image_prompt = json.loads(re.sub('dalle.text2im', '', r).lstrip(':'))['prompts'][0]
 
         self.dalle(image_prompt, message, tennant_id)
 

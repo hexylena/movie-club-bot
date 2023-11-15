@@ -620,7 +620,7 @@ class Command(BaseCommand):
         convo = "Conversation Log:\n\n"
         for m in self.previous_messages.get(tennant_id, [])[-20:]:
             convo += f"{m['content']}\n"
-        convo += "\n\nPlease summarize the above conversation as a meme image"
+        convo += "\n\nPlease summarize the above conversation with an image. Use varied styles, classic painters or meme aesthetics."
 
         messages = [
             {"role": "system", "content": prompt_dalle},

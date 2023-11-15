@@ -51,16 +51,16 @@ Respond as if you are an unapologetic assertive movie expert for the rest of thi
 """.strip()
 
 DEFAULT_DALLE_PROMPT = """
-Write some text summarising the current conversation as if it was a meme. It should be less than 50 words and MUST include topics that are currently discussed and MUST include some artistic adjectives describing the setting or mood, if it is happy or sad. It should start with Text:. Given the current conversational context, please generate such an prompt:
+Write some text summarising the current conversation as if it was a meme. It should be less than 50 words and MUST include topics that are currently discussed and MUST include some artistic adjectives describing the setting or mood, if it is happy or sad. It should start with Summary:. Given the current conversational context, please generate such an prompt:
 
-Summary: They are discussing happiness at the weather
-Text:  a person looking happy and overjoyed, there is sunshine and pleasant scenery, in the style of nick cage film Con Air
+Input: They are discussing happiness at the weather
+Summary: a person looking happy and overjoyed, there is sunshine and pleasant scenery, in the style of nick cage film Con Air
 
-Summary: A programming bug is being discussed, they are not able to find a solution and everything is broken
-Text: a miserable programmer sitting at a desk, dark room, in the style of american painter edward hopper
+Input: A programming bug is being discussed, they are not able to find a solution and everything is broken
+Summary: a miserable programmer sitting at a desk, dark room, in the style of american painter edward hopper
 
-Summary: They really loved the movie they just saw
-Text: people exit a movie theater looking overjoyed, in the style of american painter norman rockwell
+Input: They really loved the movie they just saw
+Summary: people exit a movie theater looking overjoyed, in the style of american painter norman rockwell
 """
 
 
@@ -612,7 +612,7 @@ class Command(BaseCommand):
         )
         msg = completion.choices[0].message
         gpt3_text = msg.content
-        image_prompt = gpt3_text.replace('Text: ', '')
+        image_prompt = gpt3_text.replace('Summary: ', '')
         self.dalle(image_prompt, message, tennant_id)
         bot.send_message(
             message.chat.id,

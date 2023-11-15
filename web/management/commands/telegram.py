@@ -508,7 +508,7 @@ class Command(BaseCommand):
         # Check if it's a function call
         function = None
         function_args = {}
-        if 'function_call' in msg:
+        if msg.function_call:
             function = msg.function_call.name
             # Note: the JSON response from the model may not be valid JSON
             try:

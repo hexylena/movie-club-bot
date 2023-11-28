@@ -619,8 +619,8 @@ class Command(BaseCommand):
 
             # Add the image description in exif comment field
             img = pyexiv2.Image(p)
-            img.modify_exif({'Exif.Image.ImageDescription': query + "({message.from_user.id})"})
-            img.modify_comment(query + "({message.from_user.id})")
+            img.modify_exif({'Exif.Image.ImageDescription': query + f"({message.from_user.id})"})
+            img.modify_comment(query + f"({message.from_user.id})")
             img.close()
 
             bot.send_photo(message.chat.id, img_data, caption=f"[Dall-e-3 prompt] {query}")

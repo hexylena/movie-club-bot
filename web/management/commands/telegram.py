@@ -619,7 +619,7 @@ class Command(BaseCommand):
 
             # Add the image description in exif comment field
             img = pyexiv2.Image(p)
-            img.modify_exif({'Exif.Image.ImageDescription': query + "({message.from_user.id})")
+            img.modify_exif({'Exif.Image.ImageDescription': query + "({message.from_user.id})"})
             img.modify_comment(query + "({message.from_user.id})")
             img.close()
 

@@ -502,7 +502,7 @@ class Command(BaseCommand):
             culled.append(i)
         return [system] + culled[::-1] + [user]
 
-    def chatgpt(self, query, message, tennant_id):
+    def _chatgpt(self, query, message, tennant_id):
         prompt = self.PROMPTS.get(tennant_id, DEFAULT_PROMPT)
         prompt += "\nFacts:\n" + "\n".join(self.tfm.get_facts())
 
@@ -546,7 +546,7 @@ class Command(BaseCommand):
             self.add_context({"role": "user", "content": query}, tennant_id)
             self.add_context({"role": "assistant", "content": "RoboCage: " + msg.content}, tennant_id)
             u = f"[{completion.usage.prompt_tokens}/{completion.usage.completion_tokens}/{c1-c0:0.2f}]"
-            bot.send_message(message.chat.id, gpt3_text.strip() + f"\n\n{u}")
+            return (message.chat.id, gpt3_text.strip(), [u])
         else:
             # Step 3, call the function
             fn = getattr(self, function)
@@ -586,9 +586,14 @@ class Command(BaseCommand):
             }, tennant_id)
             u = f"[{completion.usage.prompt_tokens}/{completion.usage.completion_tokens}/{c1-c0:0.2f}]"
             u2 = f"[{second_response.usage.prompt_tokens}/{second_response.usage.completion_tokens}/{c2-c1:0.2f}]"
-            bot.send_message(message.chat.id, gpt3_text.strip() + f"\n\n{u}\n{u2}")
 
-            return 
+            return (message.chat.id, gpt3_text.strip(),  [u, u2])
+
+    def chatgpt(self, query, message, tennant_id):
+        chat, response, stats = self._chatgpt(query, message, tennant_id)
+        response = response + '\n\n' + '\n'.join(map(str, stats))
+        bot.send_message(chat, response)
+
 
     def add_context(self, msg, tennant_id):
         if tennant_id not in self.previous_messages:
@@ -606,6 +611,25 @@ class Command(BaseCommand):
             image_url = response.data[0].url
             img_data = requests.get(image_url).content
             bot.send_photo(message.chat.id, img_data, caption=f"[Dall-e-3 prompt] {query}")
+        except Exception as ire:
+            bot.send_message(
+                message.chat.id,
+                f"{ire}\nQuery: {query}"
+            )
+
+    def tts_context(self, query, message, tennant_id):
+        chat, response, stats = self._chatgpt(query, message, tennant_id)
+        try:
+            zz = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+            zz.close()
+
+            response = client.audio.speech.create(
+                model="tts-1",
+                voice='alloy',
+                input=' '.join(response),
+            )
+            response.stream_to_file(zz.name)
+            bot.send_audio(message.chat.id, zz.name, caption=query + '\n\n' + '\n'.join(map(str, stats)))
         except Exception as ire:
             bot.send_message(
                 message.chat.id,
@@ -817,6 +841,8 @@ class Command(BaseCommand):
                 message.chat.type == "private" and not message.from_user.is_bot
             ):
                 self.dalle_context(message.text, message, tennant_id)
+            elif random.random() < 0.01:
+                self.tts_context(message.text, message, tennant_id)
 
 
     def prompt_get(self, message):

@@ -29,6 +29,7 @@ import re
 import tempfile
 import requests
 import telebot
+from telebot.types import InputFile
 from openai import OpenAI
 
 client = OpenAI(
@@ -629,7 +630,7 @@ class Command(BaseCommand):
                 input=' '.join(response),
             )
             response.stream_to_file(zz.name)
-            bot.send_audio(message.chat.id, zz.name, caption=query + '\n\n' + '\n'.join(map(str, stats)))
+            bot.send_audio(message.chat.id, InputFile(zz.name), caption=query + '\n\n' + '\n'.join(map(str, stats)))
         except Exception as ire:
             bot.send_message(
                 message.chat.id,
@@ -647,7 +648,7 @@ class Command(BaseCommand):
                 input=' '.join(query[1]),
             )
             response.stream_to_file(zz.name)
-            bot.send_audio(message.chat.id, zz.name, caption=query)
+            bot.send_audio(message.chat.id, InputFile(zz.name), caption=query)
         except Exception as ire:
             bot.send_message(
                 message.chat.id,

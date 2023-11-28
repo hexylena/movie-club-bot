@@ -5,6 +5,7 @@ from django.template import loader
 import requests
 import datetime
 import time
+import glob
 import os
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -47,6 +48,14 @@ def index(request, acct):
         "watched": watched,
     }
     return HttpResponse(template.render(context, request))
+
+
+def dalle(request):
+    images = glob.glob("/store/*.png")
+    # Just the basename
+    images = sorted([os.path.basename(x) for x in images])[::-1]
+    template = loader.get_template("dalle.html")
+    return HttpResponse(template.render({'images': images}, request))
 
 
 def profile(request, acct):

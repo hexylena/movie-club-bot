@@ -12,4 +12,5 @@ urlpatterns = [
     path("status", views.status, name="status"),
     path("manifest.json", views.manifest, name="manifest"),
     path('sentry-debug/', trigger_error),
+    path("dalle", views.dalle, name="dalle"),
 ]

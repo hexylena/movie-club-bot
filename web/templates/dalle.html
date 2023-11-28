@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Movie List
+{% endblock %}
+
+{% block content %}
+<h1>Dall·E Gallery</h1>
+
+{% load static %}
+<div style="display: flex; flex-direction: row; flex-wrap: wrap">
+	{% for image in images %}
+	<a href="{% static image %}">
+		<img src="{% static image %}" width=256>
+	</a>
+	{% endfor %}
+</div>
+
+{% endblock %}

@@ -723,6 +723,7 @@ class Command(BaseCommand):
                         "/prompt-get - see current prompt",
                         "/prompt-set - set current prompt",
                         "/dumpcontext - see current context",
+                        "/dallecontext - Dall·e from the current convo context",
                         "/dalle <prompt>",
                         "/chatty - Make cagebot more chatty",
                         "/shush - Tell him to shush",
@@ -789,6 +790,8 @@ class Command(BaseCommand):
             self.CHATTINESS[tennant_id] = self.CHATTINESS_ANNOYING
         elif message.text.startswith("/shush") or message.text.startswith("/shhhh"):
             self.CHATTINESS[tennant_id] = self.CHATTINESS_DEFAULT
+        elif message.text.startswith("/dallecontext"):
+            self.dalle_context(message.text, message, tennant_id)
         elif message.text.startswith("/dalle"):
             self.dalle(message.text[len('/dalle') + 1 :], message, tennant_id)
         elif message.text.startswith("/error"):

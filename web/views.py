@@ -1,4 +1,6 @@
 from django.shortcuts import render
+import re
+from django.conf import settings
 import collections
 from .models import MovieSuggestion
 from django.template import loader
@@ -53,7 +55,10 @@ def index(request, acct):
 def dalle(request):
     images = glob.glob("/store/*.png")
     # Just the basename
-    images = sorted([os.path.basename(x) for x in images])[::-1]
+    images = sorted([
+        settings.MEDIA_URL + os.path.basename(x)
+        for x in images
+    ])[::-1]
     template = loader.get_template("dalle.html")
     return HttpResponse(template.render({'images': images}, request))
 
@@ -140,3 +145,8 @@ def manifest(request):
     }
 
     return JsonResponse(manifest)
+
+def static_file(request, path):
+    if not re.match(r'^[0-9.-]+$', path):
+        return HttpResponse(status=404)
+    return HttpResponse(open(os.path.join(settings.MEDIA_ROOT, path + '.png'), 'rb').read(), content_type="image/png")

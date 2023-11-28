@@ -29,6 +29,7 @@ import re
 import tempfile
 import requests
 import telebot
+import pyexiv2
 from telebot.types import InputFile
 from openai import OpenAI
 
@@ -608,9 +609,20 @@ class Command(BaseCommand):
 
     def dalle(self, query, message, tennant_id):
         try:
+            p = os.path.join('/store', f'{time.time()}-{tennant_id}.png')
+
             response = client.images.generate(prompt=query, model="dall-e-3", n=1, size="1024x1024")
             image_url = response.data[0].url
             img_data = requests.get(image_url).content
+            with open(p, 'wb') as handle:
+                handle.write(img_data)
+
+            # Add the image description in exif comment field
+            img = pyexiv2.Image(p)
+            img.modify_exif({'Exif.Image.ImageDescription': query})
+            img.modify_comment(query)
+            img.close()
+
             bot.send_photo(message.chat.id, img_data, caption=f"[Dall-e-3 prompt] {query}")
         except Exception as ire:
             bot.send_message(

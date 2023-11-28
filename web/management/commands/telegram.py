@@ -611,7 +611,7 @@ class Command(BaseCommand):
         try:
             p = os.path.join('/store', f'{time.time()}-{tennant_id}.png')
 
-            response = client.images.generate(prompt=query, model="dall-e-3", n=1, size="1024x1024")
+            response = client.images.generate(prompt=query, model="dall-e-3", n=1, size="1024x1024", user=str(message.from_user.id))
             image_url = response.data[0].url
             img_data = requests.get(image_url).content
             with open(p, 'wb') as handle:
@@ -619,8 +619,8 @@ class Command(BaseCommand):
 
             # Add the image description in exif comment field
             img = pyexiv2.Image(p)
-            img.modify_exif({'Exif.Image.ImageDescription': query})
-            img.modify_comment(query)
+            img.modify_exif({'Exif.Image.ImageDescription': query + "({message.from_user.id})")
+            img.modify_comment(query + "({message.from_user.id})")
             img.close()
 
             bot.send_photo(message.chat.id, img_data, caption=f"[Dall-e-3 prompt] {query}")
@@ -640,6 +640,7 @@ class Command(BaseCommand):
                 model="tts-1",
                 voice='alloy',
                 input=' '.join(response),
+                user=str(message.from_user.id)
             )
             response.stream_to_file(zz.name)
             bot.send_audio(message.chat.id, InputFile(zz.name), caption=query + '\n\n' + '\n'.join(map(str, stats)))
@@ -658,6 +659,7 @@ class Command(BaseCommand):
                 model="tts-1",
                 voice='alloy',
                 input=query,
+                user=str(message.from_user.id)
             )
             response.stream_to_file(zz.name)
             bot.send_audio(message.chat.id, InputFile(zz.name), caption=query)
@@ -683,7 +685,8 @@ class Command(BaseCommand):
         print("DALLE CONTEXT")
         print(messages)
         completion = client.chat.completions.create(
-            model="gpt-4-0613", messages=messages
+            model="gpt-4-0613", messages=messages,
+            user=str(message.from_user.id)
         )
         r = completion.choices[0].message.content
         import re
@@ -812,6 +815,7 @@ class Command(BaseCommand):
                     top_p=1,
                     frequency_penalty=0,
                     presence_penalty=0,
+                    user=str(message.from_user.id)
                 )
                 gpt3_text = response.choices[0].message.content
                 bot.reply_to(

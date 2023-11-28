@@ -604,10 +604,26 @@ class Command(BaseCommand):
         try:
             response = client.images.generate(prompt=query, model="dall-e-3", n=1, size="1024x1024")
             image_url = response.data[0].url
-            zz = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-            zz.close()
             img_data = requests.get(image_url).content
             bot.send_photo(message.chat.id, img_data, caption=f"[Dall-e-3 prompt] {query}")
+        except Exception as ire:
+            bot.send_message(
+                message.chat.id,
+                f"{ire}\nQuery: {query}"
+            )
+
+    def tts(self, query, message, tennant_id):
+        try:
+            zz = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+            zz.close()
+
+            response = client.audio.speech.create(
+                model="tts-1",
+                voice='alloy',
+                input=' '.join(query[1]),
+            )
+            response.stream_to_file(zz.name)
+            bot.send_audio(message.chat.id, zz.name, caption=query)
         except Exception as ire:
             bot.send_message(
                 message.chat.id,
@@ -717,6 +733,8 @@ class Command(BaseCommand):
             self.update_imdb_meta(message)
         elif message.text.startswith("/wrapped"):
             self.wrapped(message)
+        elif message.text.startswith("/tts"):
+            self.tts(message.text[len('/tts') + 1 :], message, tennant_id)
         elif message.text.startswith("/dumpcontext"):
             self.dumpcontext(message)
         elif message.text.startswith("/prompt-get-dalle"):

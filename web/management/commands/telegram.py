@@ -661,8 +661,7 @@ class Command(BaseCommand):
             response = client.audio.speech.create(
                 model="tts-1",
                 voice='alloy',
-                input=query,
-                user=str(message.from_user.id)
+                input=query
             )
             response.stream_to_file(zz.name)
             bot.send_audio(message.chat.id, InputFile(zz.name), caption=query)

@@ -54,6 +54,8 @@ def index(request, acct):
 
 def dalle(request):
     images = glob.glob("/store/*.png")
+    # Remove the thumbs
+    images = [i for i in images if '.256.png' not in i]
     # Just the basename
     images = sorted([
         settings.MEDIA_URL + os.path.basename(x)

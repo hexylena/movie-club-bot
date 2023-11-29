@@ -30,6 +30,7 @@ import tempfile
 import requests
 import telebot
 import pyexiv2
+import subprocess
 from telebot.types import InputFile
 from openai import OpenAI
 
@@ -616,6 +617,8 @@ class Command(BaseCommand):
             img_data = requests.get(image_url).content
             with open(p, 'wb') as handle:
                 handle.write(img_data)
+
+            subprocess.check_call(['convert', '-resize', '256x', p, p + '.256.png'])
 
             # Add the image description in exif comment field
             img = pyexiv2.Image(p)

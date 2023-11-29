@@ -776,6 +776,8 @@ class Command(BaseCommand):
             self.update_imdb_meta(message)
         elif message.text.startswith("/wrapped"):
             self.wrapped(message)
+        elif message.text.startswith("/ttscontext"):
+            self.tts_context(message.text[len('/ttscontext') + 1 :], message, tennant_id)
         elif message.text.startswith("/tts"):
             self.tts(message.text[len('/tts') + 1 :], message, tennant_id)
         elif message.text.startswith("/dumpcontext"):

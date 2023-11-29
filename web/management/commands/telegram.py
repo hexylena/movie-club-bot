@@ -570,6 +570,8 @@ class Command(BaseCommand):
                     "content": result,
                 }
             ]
+            # Not sure why this keeps happening
+            final_messages = [x for x in final_messages if x['content'] is not None]
             print(final_messages)
             second_response = client.chat.completions.create(
                 model="gpt-3.5-turbo-0613",

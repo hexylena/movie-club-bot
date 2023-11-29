@@ -634,8 +634,8 @@ class Command(BaseCommand):
             )
 
     def tts_context(self, query, message, tennant_id):
-        chat, response, stats = self._chatgpt(query, message, tennant_id)
-        print(chat, response, stats)
+        chat, gpt_response, stats = self._chatgpt(query, message, tennant_id)
+        print(chat, gpt_response, stats)
         try:
             zz = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
             zz.close()
@@ -643,10 +643,10 @@ class Command(BaseCommand):
             response = client.audio.speech.create(
                 model="tts-1",
                 voice='alloy',
-                input=response
+                input=gpt_response
             )
             response.stream_to_file(zz.name)
-            bot.send_audio(message.chat.id, InputFile(zz.name), caption=response + '\n\n' + '\n'.join(map(str, stats)))
+            bot.send_audio(message.chat.id, InputFile(zz.name), caption=gpt_response + '\n\n' + '\n'.join(map(str, stats)))
         except Exception as ire:
             bot.send_message(
                 message.chat.id,

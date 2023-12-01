@@ -27,7 +27,11 @@ def tennant_list(request):
 
 def index(request, acct):
     template = loader.get_template("list.html")
-    tg = TelegramGroup.objects.get(tennant_id=str(acct))
+    try:
+        tg = TelegramGroup.objects.get(tennant_id=str(acct))
+    except:
+        tg = "¿NO SE?"
+        pass
     suggestions = MovieSuggestion.objects.filter(tennant_id=str(acct), status=0) \
         .select_related('suggested_by') \
         .prefetch_related('buffs') \

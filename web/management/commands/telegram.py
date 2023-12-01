@@ -707,7 +707,7 @@ class Command(BaseCommand):
 
     def command_dispatch(self, message):
         tennant_id = str(message.chat.id)
-        chat_name = message.chat.title
+        chat_name = message.chat.title or message.chat.username
         tg, created = TelegramGroup.objects.get_or_create(tennant_id=tennant_id, name=chat_name)
         tg.count += 1
         message_s = str(message)

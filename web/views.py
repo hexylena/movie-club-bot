@@ -48,6 +48,7 @@ def index(request, acct):
             key=lambda x: -x.get_score,
         ),
         "watched": watched,
+        "tennant_id": acct,
     }
     return HttpResponse(template.render(context, request))
 

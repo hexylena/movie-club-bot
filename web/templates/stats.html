@@ -6,10 +6,10 @@ Stats
 
 {% block breadcrumbs %}
 	<li class="nav-item">
-		<a href="{% url 'index' acct %}" class="nav-link active">{{ tg }}</a>
+		<a href="{% url 'index' acct %}" class="nav-link">{{ tg }}</a>
 	</li>
 	<li class="nav-item">
-		<span class="nav-link active">State</span>
+		<span class="nav-link active">Stats</span>
 	</li>
 {% endblock %}
 
@@ -48,7 +48,7 @@ Stats
 	<tbody>
 		{% for month, row in data.burnup.items %}
 		<tr>
-			<th scope="row">{{ month }}</th>
+			<th scope="row">{{ row.name }}</th>
 			<td style="--start:{{ row.watched_start_percent }};--end:{{ row.watched_end_percent }};">
 				<span class="data"> {{ row.watched }} </span>
 			</td>

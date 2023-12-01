@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -18,4 +18,5 @@ urlpatterns = [
     path('sentry-debug/', trigger_error),
     path("dalle", views.dalle, name="dalle"),
     path('media/<str:path>.png', views.static_file),
+    path("__debug__/", include("debug_toolbar.urls")),
 ]

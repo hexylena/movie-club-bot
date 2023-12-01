@@ -154,6 +154,8 @@ def stats(request, acct):
         for year in years
     }
 
+    # months = {(i + 1): y for (i, y) in enumerate('jan feb mar apr may jun jul aug sep oct nov dec'.split(' '))}
+    months = {(i + 1): y for (i, y) in enumerate('j f m a m j j a s o n d'.split(' '))}
 
     for year in years:
         count = years[year]['suggestions_count'] + years[year]['watched_count']
@@ -165,6 +167,8 @@ def stats(request, acct):
             years[year]['burnup'][month]['watched_start_percent'] = years[year]['burnup'][month]['watched_start'] / count
             years[year]['burnup'][month]['added_end_percent'] = years[year]['burnup'][month]['added_end'] / count
             years[year]['burnup'][month]['watched_end_percent'] = years[year]['burnup'][month]['watched_end'] / count
+            print(months, month)
+            years[year]['burnup'][month]['name'] = months[month]
 
         suggestions_year = suggestions.filter(added__year=year)
         genres = collections.Counter()

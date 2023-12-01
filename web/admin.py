@@ -10,6 +10,7 @@ from .models import (
     Interest,
     AntiInterest,
     Event,
+    TelegramGroup
 )
 
 
@@ -68,3 +69,9 @@ class EventAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Event, EventAdmin)
+
+
+class TelegramGroupAdmin(admin.ModelAdmin):
+    list_display = ("id", "name")
+
+admin.site.register(TelegramGroup, TelegramGroupAdmin)

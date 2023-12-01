@@ -4,6 +4,15 @@
 Stats
 {% endblock %}
 
+{% block breadcrumbs %}
+	<li class="nav-item">
+		<a href="{% url 'index' acct %}" class="nav-link active">{{ tg }}</a>
+	</li>
+	<li class="nav-item">
+		<span class="nav-link active">State</span>
+	</li>
+{% endblock %}
+
 {% block content %}
 <h1>Movie Stats</h1>
 {% for year, data in years.items %}

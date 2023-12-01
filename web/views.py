@@ -2,7 +2,7 @@ from django.shortcuts import render
 import re
 from django.conf import settings
 import collections
-from .models import MovieSuggestion
+from .models import MovieSuggestion, TelegramGroup
 from django.template import loader
 import requests
 import datetime
@@ -27,6 +27,7 @@ def tennant_list(request):
 
 def index(request, acct):
     template = loader.get_template("list.html")
+    tg = TelegramGroup.objects.get(tennant_id=str(acct))
     suggestions = MovieSuggestion.objects.filter(tennant_id=str(acct), status=0) \
         .select_related('suggested_by') \
         .prefetch_related('buffs') \
@@ -49,6 +50,7 @@ def index(request, acct):
         ),
         "watched": watched,
         "tennant_id": acct,
+        "tg": tg,
     }
     return HttpResponse(template.render(context, request))
 
@@ -165,6 +167,8 @@ def stats(request, acct):
         ),
         "watched": watched,
         "years": years,
+        "acct": acct,
+        "tg": TelegramGroup.objects.get(tennant_id=acct),
     }
     template = loader.get_template("stats.html")
     return HttpResponse(template.render(context, request))

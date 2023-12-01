@@ -122,8 +122,8 @@ def stats(request, acct):
     years = {
         year: {
             "suggestions": suggestions.filter(added__year=year),
-            "watched": watched.filter(status_changed_date__year=year, status=1),
-            "watched_count": watched.filter(status_changed_date__year=year, status=1).count(),
+            "watched": watched.filter(status_changed_date__year=year),
+            "watched_count": watched.filter(status_changed_date__year=year).count(),
             "suggestions_count": suggestions.filter(added__year=year).count(),
             "suggested_not_watched_count": suggestions.filter(added__year=year, status=0).count(),
             "top_rated": sorted(watched.filter(status_changed_date__year=year), key=lambda x: x.get_rating_nonavg)[-6:][::-1],
@@ -134,10 +134,29 @@ def stats(request, acct):
                     (x.get_rating, x.get_ourvotes, 5 - x.get_rating, x.get_ourvotes * (5 - x.get_rating), x ) 
                     for x in watched.filter(status_changed_date__year=year)
                 ], key=lambda x: x[3])[-6:][::-1]
-            ]
+            ],
+            "burnup": {
+                k: {
+                    'added_end': suggestions.filter(added__year=year, added__month__lte=k).count(),
+                    'watched_end': watched.filter(status_changed_date__year=year, status_changed_date__month__lte=k).count(),
+                }
+                for k in range(1, 13)
+            },
         }
         for year in years
     }
+
+
+    for year in years:
+        count = years[year]['suggestions_count'] + years[year]['watched_count']
+        for month in years[year]['burnup']:
+            years[year]['burnup'][month]['added_start'] = years[year]['burnup'][month - 1]['added_end'] if month > 1 else 0
+            years[year]['burnup'][month]['watched_start'] = years[year]['burnup'][month - 1]['watched_end'] if month > 1 else 0
+
+            years[year]['burnup'][month]['added_start_percent'] = years[year]['burnup'][month]['added_start'] / count
+            years[year]['burnup'][month]['watched_start_percent'] = years[year]['burnup'][month]['watched_start'] / count
+            years[year]['burnup'][month]['added_end_percent'] = years[year]['burnup'][month]['added_end'] / count
+            years[year]['burnup'][month]['watched_end_percent'] = years[year]['burnup'][month]['watched_end'] / count
 
     context = {
         "unwatched": sorted(

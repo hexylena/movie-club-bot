@@ -26,6 +26,30 @@ Stats
 							Watched
 						</div>
 					</div>
+
+<table class="charts-css area multiple hide-data show-labels">
+	<caption> Burnup chart </caption>
+	<thead>
+		<tr>
+			<th scope="col"> Month </th>
+			<th scope="col"> Watched </th>
+			<th scope="col"> Added </th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for month, row in data.burnup.items %}
+		<tr>
+			<th scope="row">{{ month }}</th>
+			<td style="--start:{{ row.watched_start_percent }};--end:{{ row.watched_end_percent }};">
+				<span class="data"> {{ row.watched }} </span>
+			</td>
+			<td style="--start:{{ row.added_start_percent }};--end:{{ row.added_end_percent }};">
+				<span class="data"> {{ row.added }} </span>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
 				</p>
 			</div>
 		</div>

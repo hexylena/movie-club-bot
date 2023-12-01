@@ -274,13 +274,7 @@ class Command(BaseCommand):
             })
         return functions
 
-    def server_status(self, full:str="yes", tennant_id: str="") -> str:
-        """
-        Obtain status information about the current server process
-
-        :param full: Show the extended results
-        :param tennant_id: The tennant, this will be set automatically
-        """
+    def locate(self):
         r = requests.get("https://ipinfo.io/json").json()
         org = r["org"]
         ip = r["ip"]
@@ -294,7 +288,17 @@ class Command(BaseCommand):
             "CPU Percentage (of 100)": psutil.cpu_percent(),
             "RAM Percentage (of 100)": psutil.virtual_memory().percent,
         }
+        return data
 
+
+    def server_status(self, full:str="yes", tennant_id: str="") -> str:
+        """
+        Obtain status information about the current server process
+
+        :param full: Show the extended results
+        :param tennant_id: The tennant, this will be set automatically
+        """
+        data = self.locate()
         return "\n".join([f"{k}: {v}" for (k, v) in data.items()])
 
     def countdown(self, chat_id, message_parts):

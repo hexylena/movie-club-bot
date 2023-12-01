@@ -709,7 +709,13 @@ class Command(BaseCommand):
         tennant_id = str(message.chat.id)
         chat_name = message.chat.title or message.chat.username
         tg, created = TelegramGroup.objects.get_or_create(tennant_id=tennant_id, name=chat_name)
+
+        # Not sure this is worth the churn?
         tg.count += 1
+        if tg.name != chat_name:
+            tg.name = chat_name
+        tg.save()
+
         message_s = str(message)
 
         if message.text.startswith("/start") or message.text.startswith("/help"):

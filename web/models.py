@@ -130,8 +130,7 @@ class MovieSuggestion(models.Model):
 
     @property
     def get_rating(self):
-        nums = CriticRating.objects.filter(film=self)
-        nums = [x.score for x in nums]
+        nums = [x.score for x in self.criticrating_set.all()]
 
         if len(nums) == 0:
             return 0
@@ -140,8 +139,7 @@ class MovieSuggestion(models.Model):
 
     @property
     def get_rating_nonavg(self):
-        nums = CriticRating.objects.filter(film=self)
-        nums = [x.score for x in nums]
+        nums = [x.score for x in self.criticrating_set.all()]
         return nums
 
     @property

@@ -97,6 +97,59 @@ def profile(request, acct):
     return HttpResponse(template.render(context, request))
 
 
+def stats(request, acct):
+    suggestions = MovieSuggestion.objects.filter(tennant_id=str(acct), status=0) \
+        .select_related('suggested_by') \
+        .prefetch_related('buffs') \
+        .prefetch_related('interest_set').prefetch_related('interest_set__user') \
+
+    # Get the year from the added_date for every movie suggestion
+    years = sorted(list(set([x.added.year for x in suggestions])))[::-1]
+
+    watched = MovieSuggestion.objects.filter(
+            tennant_id=str(acct), status=1
+        ) \
+        .select_related('suggested_by') \
+        .prefetch_related('buffs') \
+        .prefetch_related('interest_set').prefetch_related('interest_set__user') \
+        .prefetch_related('criticrating_set') \
+        .prefetch_related('criticrating_set__user') \
+        .order_by("-status_changed_date")
+
+    top_voted = sorted(watched, key=lambda x: x.get_ourvotes)[0:5]
+
+    years = {
+        year: {
+            "suggestions": suggestions.filter(added__year=year),
+            "watched": watched.filter(status_changed_date__year=year, status=1),
+            "watched_count": watched.filter(status_changed_date__year=year, status=1).count(),
+            "suggestions_count": suggestions.filter(added__year=year).count(),
+            "suggested_not_watched_count": suggestions.filter(added__year=year, status=0).count(),
+            "top_rated": sorted(watched.filter(status_changed_date__year=year), key=lambda x: x.get_rating_nonavg)[-6:][::-1],
+            "disappointments": [
+                x
+                for (rating, votes, invert_votes, score, x) in
+                sorted([
+                    (x.get_rating, x.get_ourvotes, 5 - x.get_rating, x.get_ourvotes * (5 - x.get_rating), x ) 
+                    for x in watched.filter(status_changed_date__year=year)
+                ], key=lambda x: x[3])[-5:][::-1]
+            ]
+        }
+        for year in years
+    }
+
+    context = {
+        "unwatched": sorted(
+            suggestions,
+            key=lambda x: -x.get_score,
+        ),
+        "watched": watched,
+        "years": years,
+    }
+    template = loader.get_template("stats.html")
+    return HttpResponse(template.render(context, request))
+
+
 def status(request):
     template = loader.get_template("status.html")
     r = requests.get("https://ipinfo.io/json").json()

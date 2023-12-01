@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Stats
+{% endblock %}
+
+{% block content %}
+<h1>Movie Stats</h1>
+{% for year, data in years.items %}
+<h2>{{ year }}</h2>
+
+<div class="row">
+	<!-- card -->
+	<div class="col-sm-6 col-md-4">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title">List Changes</h3>
+				<p class="card-text">
+					<div class="row">
+						<div class="col-6">
+							<div class="fs-1">{{ data.suggestions_count }}</div>
+							Added
+						</div>
+						<div class="col-6">
+							<div class="fs-1">{{ data.watched_count }}</div>
+							Watched
+						</div>
+					</div>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-6 col-md-4">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title">Top Rated Films</h3>
+				<p class="card-text">
+					<table class="table table-striped">
+					{% for s in data.top_rated %}
+					<tr>
+						<td>{{ s.title }}</td>
+						<td>{{ s.get_rating | floatformat:2 }}</td>
+					</tr>
+
+					{% endfor %}
+					</table>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-6 col-md-4">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title">Biggest Disappointments</h3>
+				<p class="card-text">
+					<table class="table table-striped">
+					{% for s in data.disappointments %}
+					<tr>
+						<td>{{ s.title }}</td>
+						<td>{{ s.get_ourvotes_emoji_s}}</td>
+						<td>{{ s.get_rating | floatformat:2 }}</td>
+					</tr>
+
+					{% endfor %}
+					</table>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+{% endfor %}
+
+
+
+{% endblock %}

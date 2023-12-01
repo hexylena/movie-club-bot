@@ -8,9 +8,11 @@ def trigger_error(request):
     division_by_zero = 1 / 0
 
 urlpatterns = [
-    path("", views.tennant_list, name="index"),
+    path("", views.tennant_list, name="home"),
     path("t/<acct>", views.index, name="index"),
     path("u/<acct>", views.profile, name="profile"),
+    path("t/<acct>/stats", views.stats, name="stats"),
+
     path("status", views.status, name="status"),
     path("manifest.json", views.manifest, name="manifest"),
     path('sentry-debug/', trigger_error),

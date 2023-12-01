@@ -79,6 +79,10 @@ class MovieSuggestion(models.Model):
         return [i.score_e for i in self.interest_set.all()]
 
     @property
+    def get_ourvotes_emoji_s(self):
+        return ''.join([i.score_e for i in self.interest_set.all()])
+
+    @property
     def get_score(self):
         try:
             buff_score = sum(

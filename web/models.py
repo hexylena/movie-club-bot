@@ -36,6 +36,15 @@ class Buff(models.Model):
             return f"+{self.short}"
 
 
+class TelegramGroup(models.Model):
+    tennant_id = models.CharField(max_length=64)
+    name = models.TextField()
+    count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+
 # Create your models here.
 class MovieSuggestion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)

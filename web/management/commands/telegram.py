@@ -18,6 +18,7 @@ from web.models import (
     PollArbitrary,
     AntiInterest,
     Event,
+    TelegramGroup,
 )
 
 import datetime
@@ -702,6 +703,9 @@ class Command(BaseCommand):
 
     def command_dispatch(self, message):
         tennant_id = str(message.chat.id)
+        chat_name = message.chat.title
+        tg = TelegramGroup.get_or_create(tennant_id=tennant_id, name=chat_name)[0]
+        tg.count += 1
         message_s = str(message)
 
         if message.text.startswith("/start") or message.text.startswith("/help"):

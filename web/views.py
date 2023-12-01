@@ -18,10 +18,12 @@ START_TIME = time.time()
 
 def tennant_list(request):
     template = loader.get_template("home.html")
-    tennant_ids = MovieSuggestion.objects.values("tennant_id").distinct()
-    tennant_ids = [x['tennant_id'] for x in tennant_ids]
+    groups = TelegramGroup.objects.all()
 
-    context = {"tennant_ids": tennant_ids}
+    # tennant_ids = MovieSuggestion.objects.values("tennant_id").distinct()
+    # tennant_ids = [x['tennant_id'] for x in tennant_ids]
+
+    context = {"groups": groups}
     return HttpResponse(template.render(context, request))
 
 

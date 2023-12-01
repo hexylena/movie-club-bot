@@ -7,8 +7,8 @@ Movie Club
 {% block content %}
 <h1>Movie List</h1>
 <ul>
-	{% for t in tennant_ids %}
-	<li><a href="t/{{ t }}">{{ t }}</a></li>
+	{% for g in groups %}
+	<li><a href="t/{{ g.tennant_id }}">{{ g.name }}</a></li>
 	{% endfor %}
 </ul>
 

@@ -166,6 +166,31 @@ def stats(request, acct):
             years[year]['burnup'][month]['added_end_percent'] = years[year]['burnup'][month]['added_end'] / count
             years[year]['burnup'][month]['watched_end_percent'] = years[year]['burnup'][month]['watched_end'] / count
 
+        suggestions_year = suggestions.filter(added__year=year)
+        genres = collections.Counter()
+
+        for s in suggestions_year:
+            g = s.genre
+            if g is None:
+                continue
+
+            if g.startswith("["):
+                genre_list = eval(g)
+                # TODO: remove later.
+                s.genre = ",".join(genre_list)
+                s.save()
+            else:
+                genre_list = g.split(",")
+
+            for genre in genre_list:
+                genres[genre] += 1
+        q = list(genres.most_common(1))[0][1]
+        years[year]['genres'] = [
+            (k, v / q)
+            for (k, v)  in list(genres.most_common(5))
+        ]
+
+
     context = {
         "unwatched": sorted(
             suggestions,

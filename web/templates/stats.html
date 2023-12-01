@@ -59,6 +59,21 @@ Stats
 		{% endfor %}
 	</tbody>
 </table>
+
+<table class="charts-css bar show-labels show-4-secondary-axes">
+	<thead>
+		<tr>
+			<th scope="col"> Genre </th> <th scope="col"> Count </th></tr>
+	</thead>
+	<tbody>
+		{% for genre in data.genres %}
+		<tr>
+			<th scope="row"> {{ genre.0 }} </th>
+			<td style="--size:{{ genre.1 }};"></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
 				</p>
 			</div>
 		</div>

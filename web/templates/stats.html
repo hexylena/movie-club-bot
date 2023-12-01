@@ -39,8 +39,17 @@ Stats
 					<table class="table table-striped">
 					{% for s in data.top_rated %}
 					<tr>
-						<td>{{ s.title }}</td>
-						<td>{{ s.get_rating | floatformat:2 }}</td>
+						<td>
+							<a href="{{ s.imdb_link }}">{{ s.title }}</a>
+							<div>
+							{% for buff in s.buffs.all %}
+								{{ buff}}
+							{% endfor %}
+							</div>
+						</td>
+						<td>{{ s.get_rating | floatformat:2 }}
+							<div class="text-muted">({{ s.get_rating_nonavg | length }} votes)</div>
+						</td>
 					</tr>
 
 					{% endfor %}
@@ -58,9 +67,18 @@ Stats
 					<table class="table table-striped">
 					{% for s in data.disappointments %}
 					<tr>
-						<td>{{ s.title }}</td>
+						<td>
+							<a href="{{ s.imdb_link }}">{{ s.title }}</a>
+							<div>
+							{% for buff in s.buffs.all %}
+								{{ buff}}
+							{% endfor %}
+							</div>
+						</td>
 						<td>{{ s.get_ourvotes_emoji_s}}</td>
-						<td>{{ s.get_rating | floatformat:2 }}</td>
+						<td>{{ s.get_rating | floatformat:2 }}
+							<div class="text-muted">({{ s.get_rating_nonavg | length }} votes)</div>
+						</td>
 					</tr>
 
 					{% endfor %}

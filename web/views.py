@@ -132,7 +132,7 @@ def stats(request, acct):
                 sorted([
                     (x.get_rating, x.get_ourvotes, 5 - x.get_rating, x.get_ourvotes * (5 - x.get_rating), x ) 
                     for x in watched.filter(status_changed_date__year=year)
-                ], key=lambda x: x[3])[-5:][::-1]
+                ], key=lambda x: x[3])[-6:][::-1]
             ]
         }
         for year in years

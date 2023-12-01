@@ -167,7 +167,6 @@ def stats(request, acct):
             years[year]['burnup'][month]['watched_start_percent'] = years[year]['burnup'][month]['watched_start'] / count
             years[year]['burnup'][month]['added_end_percent'] = years[year]['burnup'][month]['added_end'] / count
             years[year]['burnup'][month]['watched_end_percent'] = years[year]['burnup'][month]['watched_end'] / count
-            print(months, month)
             years[year]['burnup'][month]['name'] = months[month]
 
         suggestions_year = suggestions.filter(added__year=year)

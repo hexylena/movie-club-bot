@@ -2,13 +2,18 @@ from django.shortcuts import render
 import re
 from django.conf import settings
 import collections
-from .models import MovieSuggestion, TelegramGroup
+from .models import MovieSuggestion, TelegramGroup, Event
 from django.template import loader
 import requests
 import datetime
 import time
 import glob
 import os
+import statistics
+import collections
+import datetime
+import copy
+import pytz
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -157,8 +162,55 @@ def stats(request, acct):
     # months = {(i + 1): y for (i, y) in enumerate('jan feb mar apr may jun jul aug sep oct nov dec'.split(' '))}
     months = {(i + 1): y for (i, y) in enumerate('j f m a m j j a s o n d'.split(' '))}
 
+    local_tz = pytz.timezone('Europe/Amsterdam')
+
     for year in years:
         count = years[year]['suggestions_count'] + years[year]['watched_count']
+
+        by_date = {}
+        delay = {}
+        for e in Event.objects.filter(event_id='countdown', tennant_id=str(acct), added__year=year):
+            key = e.added.strftime('%m-%d')
+
+            if key not in by_date:
+                by_date[key] = []
+                delay[key] = []
+
+            time_local = e.added.astimezone(local_tz).strftime('%H:%M')
+            by_date[key].append(time_local)
+
+            # We start at 1930
+            official_start = local_tz.localize(datetime.datetime(e.added.year, e.added.month, e.added.day, hour=19, minute=30))
+            minutes_late = (e.added - official_start).total_seconds() // 60
+            delay[key].append(minutes_late)
+
+        # Distribution of false starts
+        false_starts = collections.Counter([len(v) - 1 for v in by_date.values()])
+
+        # avg delay over 1930?
+        avg_delay = [max(v) for v in delay.values()]
+
+        # number of times on-time?
+        # on time (<=1930), within 15 minutes, 30 minutes, 60 minutes.
+        first_start = [min(v) for v in delay.values()]
+        on_time = len([x for x in first_start if x <= 0])
+        w15 = len([x for x in first_start if 0 < x <= 15])
+        w30 = len([x for x in first_start if 15 < x <= 30])
+        w60 = len([x for x in first_start if 30 < x <= 60])
+        wover = len([x for x in first_start if 60 < x])
+
+        if len(false_starts.values()) > 0:
+            vmax = max(false_starts.values())
+            years[year]['start_times'] = {
+                'false_starts': {k: v / vmax for (k, v) in false_starts.items()},
+                'delay': {
+                    'min': min(avg_delay),
+                    'avg': statistics.mean(avg_delay),
+                    'max': max(avg_delay),
+                },
+                'on_time': [on_time, w15, w30, w60, wover]
+            }
+
         for month in years[year]['burnup']:
             years[year]['burnup'][month]['added_start'] = years[year]['burnup'][month - 1]['added_end'] if month > 1 else 0
             years[year]['burnup'][month]['watched_start'] = years[year]['burnup'][month - 1]['watched_end'] if month > 1 else 0

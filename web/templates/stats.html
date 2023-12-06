@@ -135,6 +135,55 @@ Stats
 			</div>
 		</div>
 	</div>
+
+	{% if data.start_times %}
+	<div class="col-sm-6 col-md-4">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title">Movie Start Time</h3>
+				<p class="card-text">
+
+					<h4>False Starts</h4>
+					<table class="charts-css bar show-labels show-4-secondary-axes">
+						<thead>
+							<tr>
+								<th scope="col"> Starts </th> <th scope="col"> Count </th></tr>
+						</thead>
+						<tbody>
+							{% for c in data.start_times.false_starts.items %}
+							<tr>
+								<th scope="row"> {{ c.0 }} </th>
+								<td style="--size:{{ c.1 }};"></td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					<h4>Average Delay</h4>
+					<table class="table table-striped">
+					<tr>
+						<td>Min</td><td>{{ data.start_times.delay.min | floatformat:0 }}</td>
+					</tr>
+					<tr>
+						<td>Avg</td><td>{{ data.start_times.delay.avg | floatformat:2 }}</td>
+					</tr>
+					<tr>
+						<td>Max</td><td>{{ data.start_times.delay.max | floatformat:0 }}</td>
+					</tr>
+					</table>
+
+					<h4>Within</h4>
+					<table class="table table-striped">
+					<tr><td>On time</td><td>{{ data.start_times.on_time.0 }}</td></tr>
+					<tr><td>Within 15 min</td><td>{{ data.start_times.on_time.1 }}</td></tr>
+					<tr><td>Within 30 min</td><td>{{ data.start_times.on_time.2 }}</td></tr>
+					<tr><td>Within 60 min</td><td>{{ data.start_times.on_time.3 }}</td></tr>
+					<tr><td>Over 60 minutes late! 😱</td><td>{{ data.start_times.on_time.4 }}</td></tr>
+					</table>
+				</p>
+			</div>
+		</div>
+	</div>
+	{% endif %}
 </div>
 
 

@@ -214,7 +214,7 @@ class Command(BaseCommand):
     previous_messages = {}
     PROMPTS = {}
     PROMPTS_DALLE = {}
-    CHATTINESS_DEFAULT = (0.025, 0.025)
+    CHATTINESS_DEFAULT = (0.025, 0.05)
     CHATTINESS_ANNOYING = (0.7, 0.1)
     CHATTINESS = {}
     tfm = TimedFactManager()

@@ -20,6 +20,7 @@ Movie List
 			<th>Suggested By</th>
 			<th>Days Since Added</th>
 			<th>IMDB rating</th>
+			<th>Runtime</th>
 			<th>Score</th>
 			<th>Buffs</th>
 			<th>Ratings</th>
@@ -46,6 +47,7 @@ Movie List
 			</td>
 			<td>{{ m.days_since_added }}</td>
 			<td>{{ m.rating }}</td>
+			<td>{{ m.runtime }}</td>
 			<td>{{ m.get_score|floatformat:2 }}</td>
 			<td>{{ m.get_buffs }}</td>
 

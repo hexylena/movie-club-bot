@@ -83,7 +83,7 @@ Movie List
 				</a>
 			</td>
 			<td>{{ m.suggested_by.first_name }}</td>
-			<td>{% if m.status_changed_date %}{{ m.status_changed_date }}{% endif %}</td>
+			<td>{% if m.status_changed_date %}{{ m.status_changed_date | date: 'Y-m-d H:M' }}{% endif %}</td>
 			<td>{{ m.get_score | floatformat:2 }}</td>
 			<td>{{ m.get_rating  }}</td>
 		</tr>
@@ -95,7 +95,7 @@ Movie List
 $(document).ready(function () {
     $('#movieTable').DataTable({
         "pageLength": 25,
-        order: [[4, 'desc']],
+        order: [[6, 'desc']],
         pagingType: 'full_numbers',
     });
 });

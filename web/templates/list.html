@@ -83,7 +83,7 @@ Movie List
 				</a>
 			</td>
 			<td>{{ m.suggested_by.first_name }}</td>
-			<td>{% if m.status_changed_date %}{{ m.status_changed_date }}{% endif %}</td>
+			<td>{% if m.status_changed_date %}{{ m.status_changed_date | date:"Y-m-d" }}{% endif %}</td>
 			<td>{{ m.get_score | floatformat:2 }}</td>
 			<td>{{ m.get_rating  }}</td>
 		</tr>

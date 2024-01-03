@@ -71,6 +71,7 @@ Movie List
 			<th>Suggested By</th>
 			<th>Watched</th>
 			<th>Score</th>
+			<th>Votes</th>
 			<th>Avg Rating</th>
 		</tr>
 	</thead>
@@ -85,7 +86,8 @@ Movie List
 			<td>{{ m.suggested_by.first_name }}</td>
 			<td>{% if m.status_changed_date %}{{ m.status_changed_date | date:"Y-m-d" }}{% endif %}</td>
 			<td>{{ m.get_score | floatformat:2 }}</td>
-			<td>{{ m.get_rating  }}</td>
+			<td>{{ m.get_ourvotes_emoji_s }}</td>
+			<td>{{ m.get_rating | floatformat:2  }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>

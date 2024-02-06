@@ -10,6 +10,7 @@ from django.contrib.auth.models import Permission
 from .personality import DissociativeIdentityDisorder
 import uuid
 
+
 from web.models import (
     CriticRating,
     Interest,

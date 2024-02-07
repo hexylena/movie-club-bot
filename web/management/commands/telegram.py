@@ -60,7 +60,7 @@ DEFAULT_DALLE_PROMPT = """
 
 ## dalle
 
-Summarize the current conversation into a meme,
+Summarize the current conversation with a dramatic image,
 
 // Whenever a description of an image is given, use dalle to create the images and then summarize the prompts used to generate the images in plain text. If the user does not ask for a specific number of images, default to creating one caption to be sent to DALL-E. All captions sent to dalle must abide by the following policies:
 

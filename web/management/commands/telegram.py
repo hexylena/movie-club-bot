@@ -263,10 +263,13 @@ class Command(BaseCommand):
                     # Skip unknown optional parameters
                     pass
                 else:
-                    props[p] = {
-                        "type": TYPES[pt.annotation],  # Let it fail.
-                        "descrption": parsed_docstring[p]
-                    }
+                    try:
+                        props[p] = {
+                            "type": TYPES[pt.annotation],  # Let it fail.
+                            "description": parsed_docstring[p]
+                        }
+                    except:
+                        pass
 
             functions.append({
                 "name": fn_name,
@@ -391,7 +394,7 @@ class Command(BaseCommand):
         films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
         # self.chatgpt("Hey nick we're thinking of watching one of these three films: {films}. Which do you recommend and why?", message, str(message.chat.id))
 
-    def file_github_issue(self, body: str, message: telebot.types.Message, tennant_id: str) -> str:
+    def file_github_issue(self, body, message, tennant_id):
         """
         File a new issue on the GitHub repository
 

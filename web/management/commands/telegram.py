@@ -391,7 +391,7 @@ class Command(BaseCommand):
         films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
         # self.chatgpt("Hey nick we're thinking of watching one of these three films: {films}. Which do you recommend and why?", message, str(message.chat.id))
 
-    def file_github_issue(self, body: str, tennant_id: str) -> str:
+    def file_github_issue(self, body: str, message: telebot.types.Message, tennant_id: str) -> str:
         """
         File a new issue on the GitHub repository
 
@@ -411,7 +411,10 @@ class Command(BaseCommand):
         repo = "hexylena/movie-club-bot"
         body += f"\n\nFiled by {tennant_id}"
         issue = g.get_repo(repo).create_issue(subject, body)
-        return f"Filed issue https://github.com/{repo}/{issue.id}"
+        bot.reply_to(
+            message,
+            f"Filed issue https://github.com/{repo}/{issue.id}"
+        )
 
     def suggest_nojj(self, message):
         unwatched = sorted(
@@ -828,7 +831,7 @@ class Command(BaseCommand):
         elif message.text.startswith("/prompt-get-dalle"):
             self.prompt_get_dalle(message)
         elif message.text.startswith("/issue"):
-            self.file_github_issue(message.text[len('/issue') + 1:], tennant_id)
+            self.file_github_issue(message.text[len('/issue') + 1:], message, tennant_id)
         elif message.text.startswith("/prompt-set-dalle"):
             self.prompt_set_dalle(message)
         elif message.text.startswith("/prompt-get"):

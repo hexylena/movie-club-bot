@@ -401,13 +401,11 @@ class Command(BaseCommand):
         """
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-0613",
-            prompt="Summarize the following issue message into a 5-10 word issue subject:\n\n" + body,
-            temperature=1.1,
-            max_tokens=512,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            user=str(tennant_id)
+            user=str(tennant_id),
+            messages=[
+                {"role": "system", "content": "Summarize the following issue message into a 5-10 word issue subject:"},
+                {"role": "user", "content": body}
+            ]
         )
         subject = response.choices[0].message.content
         repo = "hexylena/movie-club-bot"

@@ -35,12 +35,16 @@ import pyexiv2
 import subprocess
 from telebot.types import InputFile
 from openai import OpenAI
+from github import Github
+from github import Auth
 
 client = OpenAI(
     api_key=os.environ['OPENAI_API_KEY']
 )
 
 bot = telebot.TeleBot(os.environ["TELOXIDE_TOKEN"])
+auth = Auth.Token(os.environ["GITHUB_TOKEN"])
+g = Github(auth=auth)
 imdb_link = re.compile("imdb.com/title/(tt[0-9]*)/?")
 MOVIE_VIEW = Permission.objects.get(name="Can view movie suggestion")
 MOVIE_ADD = Permission.objects.get(name="Can add movie suggestion")
@@ -386,6 +390,30 @@ class Command(BaseCommand):
 
         films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
         # self.chatgpt("Hey nick we're thinking of watching one of these three films: {films}. Which do you recommend and why?", message, str(message.chat.id))
+
+    def file_github_issue(self, body: str, tennant_id: str) -> str:
+        """
+        File a new issue on the GitHub repository
+
+        :param subject: The subject of the issue
+        :param body: The body of the issue
+        :param tennant_id: The tennant, this will be set automatically
+        """
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo-0613",
+            prompt="Summarize the following issue message into a 5-10 word issue subject:\n\n" + body,
+            temperature=1.1,
+            max_tokens=512,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+            user=str(tennant_id)
+        )
+        subject = response.choices[0].message.content
+        repo = "hexylena/movie-club-bot"
+        body += f"\n\nFiled by {tennant_id}"
+        issue = g.get_repo(repo).create_issue(subject, body)
+        return f"Filed issue https://github.com/{repo}/{issue.id}"
 
     def suggest_nojj(self, message):
         unwatched = sorted(
@@ -801,6 +829,8 @@ class Command(BaseCommand):
             self.dumpcontext(message)
         elif message.text.startswith("/prompt-get-dalle"):
             self.prompt_get_dalle(message)
+        elif message.text.startswith("/issue"):
+            self.file_github_issue(message, tennant_id)
         elif message.text.startswith("/prompt-set-dalle"):
             self.prompt_set_dalle(message)
         elif message.text.startswith("/prompt-get"):

@@ -413,7 +413,7 @@ class Command(BaseCommand):
         issue = g.get_repo(repo).create_issue(subject, body)
         bot.reply_to(
             message,
-            f"Filed issue https://github.com/{repo}/{issue.id}"
+            f"Filed issue https://github.com/{repo}/issues/{issue.number}"
         )
 
     def suggest_nojj(self, message):

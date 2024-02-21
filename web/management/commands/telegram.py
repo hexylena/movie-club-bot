@@ -830,7 +830,7 @@ class Command(BaseCommand):
         elif message.text.startswith("/prompt-get-dalle"):
             self.prompt_get_dalle(message)
         elif message.text.startswith("/issue"):
-            self.file_github_issue(message, tennant_id)
+            self.file_github_issue(message.text[len('/issue') + 1:], tennant_id)
         elif message.text.startswith("/prompt-set-dalle"):
             self.prompt_set_dalle(message)
         elif message.text.startswith("/prompt-get"):

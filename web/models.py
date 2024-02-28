@@ -302,7 +302,7 @@ class Interest(models.Model):
         }.get(self.score, "?")
 
     def __str__(self):
-        return f"{self.user.first_name}|{self.film}|{self.score}"
+        return f"({self.id}){self.user.first_name}|{self.film}|{self.score}"
 
 
 class CriticRating(models.Model):

@@ -20,3 +20,23 @@ class Command(BaseCommand):
                     user.user_permissions.add(Permission.objects.get(name=f"Can {permission} {table}"))
 
             user.save()
+
+        # Remove duplicate intersts
+        d = {}
+        for i in web.models.Interest.objects.all():
+            k = f"{i.film_id}|{i.user_id}"
+            if k not in d:
+                d[k] = []
+
+            d[k].append(i)
+
+        for k, v in d.items():
+            if len(v) == 1:
+                continue
+
+            # Find the most recent one
+            v = sorted(v, key=lambda x: x.id)[::-1]
+
+            print(f"Removing duplicate interests for {k}: {v}")
+            for i in v[1:]:
+                i.delete()

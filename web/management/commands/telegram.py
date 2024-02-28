@@ -168,13 +168,22 @@ def handle_user_response(response):
         interest = 2 - option_ids[0]
         print(interest)
 
-        ci = Interest.objects.create(
-            tennant_id=poll.tennant_id,
-            user=user,
-            film=film,
-            score=interest,
-        )
-        ci.save()
+        try:
+            ci = Interest.objects.get(
+                tennant_id=poll.tennant_id,
+                user=user,
+                film=film
+            )
+            ci.score = interest
+            ci.save()
+        except Interest.DoesNotExist:
+            ci = Interest.objects.create(
+                tennant_id=poll.tennant_id,
+                user=user,
+                film=film,
+                score=interest,
+            )
+            ci.save()
     elif poll.poll_type == "removal":
         # tt8064418__tt7286966__tt4682266 [1] Helena
         tt_id = poll.options.split("__")[option_ids[0]]

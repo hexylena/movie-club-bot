@@ -1054,6 +1054,11 @@ class Command(BaseCommand):
 
                 try:
                     self.command_dispatch(message)
+                except RateLimitError as rle:
+                    bot.send_message(
+                        message.chat.id,
+                        f"⚠️  {rle}",
+                    )
                 except Exception as e:
                     capture_exception(e)
                     bot.send_message(

@@ -947,7 +947,7 @@ class Command(BaseCommand):
 
     def send_interest_poll(self, message, film):
         question = f"Do you wanna see {film}?"
-        options = ["💯", "🆗", "🤷‍♀️🤷🤷‍♂️ meh", "🤬hatewatch", "🚫veto🙅"]
+        options = ["💯", "🆗", "🤷‍♀️🤷🤷‍♂️ meh", "🤬cinemacraptastic", "🚫veto🙅"]
 
         r = bot.send_poll(
             message.chat.id, question=question, options=options, is_anonymous=False

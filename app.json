@@ -4,5 +4,16 @@
       "predeploy": "python manage.py migrate --noinput",
       "postdeploy": "python manage.py upgrade_users; python manage.py fetch_imdb"
     }
+  },
+  "healthchecks": {
+    "web": [
+        {
+            "type":        "startup",
+            "name":        "web check",
+            "description": "Checking if the app responds to the / endpoint",
+            "path":        "/",
+            "attempts": 3
+        }
+    ]
   }
 }

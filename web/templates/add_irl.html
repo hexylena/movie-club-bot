@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Register an In-Person Movie Experience
+{% endblock %}
+
+{% block content %}
+
+<h1>Let's go see a film!</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="fieldWrapper">
+	<h2>{{ field.label_tag }}</h2>
+	{{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}
+          <p class="help" id="{{ field.auto_id }}_helptext">
+            {{ field.help_text|safe }}
+          </p>
+        {% endif %}
+    </div>
+{% endfor %}
+
+    <input type="submit" value="Submit" class="btn btn-primary">
+
+<script>
+document.querySelectorAll("input[type='text']").forEach(q => q.classList.add("form-control"))
+document.querySelectorAll("input[type='datetime-local']").forEach(q => q.classList.add("form-control"))
+
+</script>
+{% endblock %}

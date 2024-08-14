@@ -5,9 +5,17 @@ import random
 import time
 import json
 import isodate
+import datetime
 import math
 from django.contrib.auth.models import User
 from web.utils import get_ld_json
+
+THEATERS = {
+    'spui': 'Pathé Spuimarkt, Den Haag',
+    'kuip': 'Pathé de Kuip, Rotterdam',
+    'rdam': 'Pathé Schouwberplein, Rotterdam',
+    'bhof': 'Pathé Buitenhof, Den Haag',
+}
 
 # Monkey patch, yikes.
 User.__str__ = lambda self: self.first_name if self.first_name else self.username
@@ -40,12 +48,77 @@ class TelegramGroup(models.Model):
     tennant_id = models.CharField(max_length=64)
     name = models.TextField()
     count = models.IntegerField(default=0)
+    uuid = models.UUIDField(default=uuid.uuid4)
 
     def __str__(self):
         return self.name
 
 
-# Create your models here.
+class InPersonMovieSuggestion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    imdb_id = models.CharField(max_length=64)
+    tennant_id = models.CharField(max_length=64)
+
+    # Meta
+    title = models.TextField(null=True, blank=True)
+    runtime = models.IntegerField(null=True, blank=True)
+    genre = models.TextField(null=True, blank=True)
+    meta = models.TextField(null=True, blank=True)
+
+    added = models.DateTimeField(auto_now_add=True)
+    imdb_update = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    # People Going
+    attendees = models.ManyToManyField(User, null=True, blank=True)
+
+    # dinner_location = models.TextField(null=True)
+    # dinner_time = models.CharField(max_length=8)
+    theater_datetime = models.DateTimeField(null=True, blank=True)
+    theater_location = models.CharField(max_length=10, null=True, blank=True)
+    showing_type = models.CharField(max_length=10, null=True, blank=True)
+
+    @property
+    def upcoming(self):
+        return self.theater_datetime > now()
+
+    def update_from_imdb(self):
+        movie_details = get_ld_json(self.imdb_id)
+        self.title = movie_details["name"].replace("&apos;", "'")
+
+        try:
+            r_s = isodate.parse_duration(movie_details["duration"]).seconds / 60
+        except:
+            r_s = 0
+
+        try:
+            g_s = ",".join(movie_details["genre"])
+        except:
+            g_s = ""
+
+        self.runtime = r_s
+        self.genre = g_s
+        self.meta = json.dumps(movie_details)
+        self.imdb_update = now()
+        self.save()
+
+    @property
+    def ics_start(self):
+        return self.theater_datetime.strftime("%Y%m%dT%H%M%SZ")
+
+    @property
+    def ics_end(self):
+        return (self.theater_datetime + datetime.timedelta(minutes=self.runtime)).strftime("%Y%m%dT%H%M%SZ")
+
+    @property
+    def needs_glasses(self):
+        return '3d' in self.showing_type
+
+    @property
+    def location_ics(self):
+        return THEATERS.get(self.theater_location, "Unknown") + ", Netherlands"
+
+
+
 class MovieSuggestion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     imdb_id = models.CharField(max_length=64)

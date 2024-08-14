@@ -1,17 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import (
-    MovieSuggestion,
-    CriticRating,
-    Buff,
-    Poll,
-    PollArbitrary,
-    Interest,
-    AntiInterest,
-    Event,
-    TelegramGroup
-)
+from .models import *
 
 
 class MovieSuggestionAdmin(admin.ModelAdmin):
@@ -75,3 +65,8 @@ class TelegramGroupAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
 
 admin.site.register(TelegramGroup, TelegramGroupAdmin)
+
+class InPersonMovieSuggestionAdmin(admin.ModelAdmin):
+    list_display = ("id", "theater_datetime", "theater_location")
+
+admin.site.register(InPersonMovieSuggestion, InPersonMovieSuggestionAdmin)

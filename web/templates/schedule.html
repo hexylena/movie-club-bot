@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+In-Person Movie Experience
+{% endblock %}
+
+{% block content %}
+
+<h1>Let's go see a film!</h1>
+
+<a class="btn btn-primary" href="{% url 'irl' acct=acct %}">Suggest a movie</a>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Date</th>
+			<th>Title</th>
+			<th>Runtime</th>
+			<th>Location</th>
+			<th>Type</th>
+			<th>Ateendees</th>
+		</tr>
+	</thead>
+
+	<tbody>
+	{% for suggestion in suggestions %}
+	<tr>
+		<td>{{ suggestion.theater_datetime }}</td>
+		<td>{{ suggestion.title }}</td>
+		<td>{{ suggestion.runtime }}</td>
+		<td>{{ suggestion.theater_location }}</td>
+		<td>{{ suggestion.showing_type }}</td>
+		<td>
+			{% for attendee in suggestion.attendees.all %}
+				{{ attendee }}
+			{% endfor %}
+		</td>
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

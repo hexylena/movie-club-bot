@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//hacksw/handcal//NONSGML v1.0//EN
+
+{% for suggestion in suggestions %}
+BEGIN:VEVENT
+UID:{{ suggestion.id }}@movie-club-bot.app.galaxians.org
+ORGANIZER;CN=Chronically Online Movie Club:MAILTO:helena.rasche@gmail.com
+DTSTART:{{ suggestion.ics_start }}
+DTEND:{{ suggestion.ics_end }}
+SUMMARY:{% if suggestion.needs_glasses %}🕶{% endif %} Movie Club sees {{ suggestion.title }}
+STATUS:CONFIRMED
+CATEGORIES:CONFERENCE
+LOCATION:{{ suggestion.location_ics }}
+DESCRIPTION:
+END:VEVENT
+{% endfor %}
+
+END:VCALENDAR

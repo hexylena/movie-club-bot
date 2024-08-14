@@ -2,6 +2,7 @@ from django.shortcuts import render
 import re
 from django.conf import settings
 import collections
+from .forms import *
 from .models import MovieSuggestion, TelegramGroup, Event
 from django.template import loader
 import requests
@@ -17,6 +18,7 @@ import pytz
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 START_TIME = time.time()
 
@@ -77,6 +79,40 @@ def dalle(request):
     ])[::-1]
     template = loader.get_template("dalle.html")
     return HttpResponse(template.render({'images': images}, request))
+
+
+def irl_movie(request, acct):
+    if request.method == "POST":
+        form = InPersonMovieSuggestionForm(request.POST)
+        print(form, form.is_valid())
+        if form.is_valid():
+            model = form.save()
+            model.update_from_imdb()
+            return redirect('schedule', acct=acct)
+    else:
+        form = InPersonMovieSuggestionForm()
+
+    return render(request, "add_irl.html", {"form": form, 'acct': acct,})
+
+@login_required
+def schedule(request, acct):
+    suggestions = InPersonMovieSuggestion.objects.filter(tennant_id=str(acct)) \
+        .order_by("-theater_datetime") \
+        .prefetch_related('attendees')
+
+    return render(request, "schedule.html", {"suggestions": suggestions, 'acct': acct})
+
+
+# 'secret' url
+def schedule_ical(request, acct_uuid):
+    tg = TelegramGroup.objects.get(uuid=acct_uuid)
+    suggestions = InPersonMovieSuggestion.objects.filter(tennant_id=tg.tennant_id) \
+        .order_by("-theater_datetime") \
+        .prefetch_related('attendees')
+
+    template = loader.get_template("schedule.ics")
+    content = template.render({"suggestions": suggestions}, request)
+    return HttpResponse(content, content_type='text/calendar')
 
 
 def profile(request, acct):

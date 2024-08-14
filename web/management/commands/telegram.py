@@ -355,6 +355,10 @@ class Command(BaseCommand):
             f"Username: {user.username}\npassword: {newpassword}\n\n Go change it at https://movie-club-bot.app.galaxians.org/admin/password_change/",
         )
 
+    def in_person_movie_suggestion(self, tennant_id: str, imdb_id: str, theater_location: str, year_month_day: str, time: str) -> str:
+        # todo: fix time.
+        pass
+
     def movie_suggestions(self, count: int=5, genre:str = None, tennant_id: str = "") -> str:
         """
         List some movies we should watch, based on our watch list.

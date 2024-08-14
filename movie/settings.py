@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +22,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-klq30g*r^s_#$7^%(dr0&s6o15$gvb2*!(jhsaz@oeir@+$^!i'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if 'SECRET_KEY' in os.environ:
+    SECRET_KEY = os.environ["SECRET_KEY"]
+else:
+    SECRET_KEY = 'django-insecure-klq30g*r^s_#$7^%(dr0&s6o15$gvb2*!(jhsaz@oeir@+$^!i'
 
 ALLOWED_HOSTS = ['movie-club-bot.app.galaxians.org', 'localhost']
+
+IS_HEROKU = "DYNO" in os.environ
+
+# SECURITY WARNING: don't run with debug turned on in production!
+if not IS_HEROKU:
+    DEBUG = True
 
 
 # Application definition
@@ -44,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,6 +63,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'movie.urls'
+
+MAX_CONN_AGE = 600
 
 TEMPLATES = [
     {
@@ -93,6 +104,15 @@ DATABASES = {
     #},
 }
 
+
+if "DATABASE_URL" in os.environ:
+    # Configure Django for DATABASE_URL environment variable.
+    DATABASES["default"] = dj_database_url.config(
+        conn_max_age=MAX_CONN_AGE, ssl_require=True)
+
+    # Enable test database if found in CI environment.
+    if "CI" in os.environ:
+        DATABASES["default"]["TEST"] = DATABASES["default"]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -139,6 +159,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Dokku
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = 'static/'
+# Enable WhiteNoise's GZip compression of static assets.
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
     '/store',
@@ -169,8 +192,8 @@ if 'SENTRY_DSN' in os.environ:
 
 
 # Dokku/Heroku
-import django_heroku
-django_heroku.settings(locals())
+# import django_heroku
+# django_heroku.settings(locals())
 
 # Debug toolbar
 INTERNAL_IPS = [
@@ -178,3 +201,4 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

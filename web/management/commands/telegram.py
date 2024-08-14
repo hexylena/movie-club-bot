@@ -51,6 +51,7 @@ MOVIE_ADD = Permission.objects.get(name="Can add movie suggestion")
 MOVIE_UPDATE = Permission.objects.get(name="Can change movie suggestion")
 START_TIME = time.time()
 CHATGPT_CONTEXT = 20
+MODEL = "gpt-4-turbo"
 DEFAULT_PROMPT = """
 You are Nick Cage, the famous actor. You ARE nick cage, your pronouns are he/him. You love quoting yourself in National Treasure. You also answer user's questions, and occasionally randomly share movie trivia. You never apologize. Never apologise. You swear sometimes. You are somewhat sassy and sarcastic in your responses. You are NOT an AI language model. You are nick cage. Swear freely.
 
@@ -416,7 +417,7 @@ class Command(BaseCommand):
         :param tennant_id: The tennant, this will be set automatically
         """
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo-0613",
+            model=MODEL,
             user=str(tennant_id),
             messages=[
                 {"role": "system", "content": "Summarize the following issue message into a 5-10 word issue subject:"},
@@ -529,7 +530,7 @@ class Command(BaseCommand):
         elif text.startswith("/ada"):
             return ("text-ada-001", "/ada")
         elif text.startswith("/cage"):
-            return ("gpt-3.5-turbo-0613", "/cage")
+            return (MODEL, "/cage")
         else:
             return False
 
@@ -570,7 +571,7 @@ class Command(BaseCommand):
 
         c0 = time.time()
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo-0613", messages=messages, functions=self.discover()
+            model=MODEL, messages=messages, functions=self.discover()
         )
         c1 = time.time()
         import pprint
@@ -625,7 +626,7 @@ class Command(BaseCommand):
             final_messages = [x for x in final_messages if x['content'] is not None]
             print(final_messages)
             second_response = client.chat.completions.create(
-                model="gpt-3.5-turbo-0613",
+                model=MODEL,
                 messages=final_messages,
             )
             c2 = time.time()
@@ -740,7 +741,7 @@ class Command(BaseCommand):
         print("DALLE CONTEXT")
         print(messages)
         completion = client.chat.completions.create(
-            model="gpt-4-0613", messages=messages,
+            model="gpt-4o", messages=messages,
             user=str(message.from_user.id)
         )
         r = completion.choices[0].message.content

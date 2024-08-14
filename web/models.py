@@ -17,6 +17,15 @@ THEATERS = {
     'bhof': 'Pathé Buitenhof, Den Haag',
 }
 
+SHOWING_TYPES = {
+    'scrx': 'ScreenX',
+    'regular': 'Regular',
+    '3d': '3D (Glasses Required)',
+    'imax': 'IMAX',
+    'imax3d': 'IMAX 3D (IMAX Glasses Required)',
+    'dolby': 'Dolby™',
+}
+
 # Monkey patch, yikes.
 User.__str__ = lambda self: self.first_name if self.first_name else self.username
 
@@ -112,6 +121,10 @@ class InPersonMovieSuggestion(models.Model):
     @property
     def needs_glasses(self):
         return '3d' in self.showing_type
+
+    @property
+    def desc(self):
+        return SHOWING_TYPES.get(self.showing_type, self.showing_type)
 
     @property
     def location_ics(self):

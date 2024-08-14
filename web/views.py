@@ -100,7 +100,7 @@ def schedule(request, acct):
         .order_by("-theater_datetime") \
         .prefetch_related('attendees')
 
-    return render(request, "schedule.html", {"suggestions": suggestions, 'acct': acct})
+    return render(request, "schedule.html", {"suggestions": suggestions, 'acct': acct, 'acct_uuid': TelegramGroup.objects.get(tennant_id=acct).uuid})
 
 
 # 'secret' url

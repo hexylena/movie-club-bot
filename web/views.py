@@ -19,6 +19,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 
 START_TIME = time.time()
 

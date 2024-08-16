@@ -16,6 +16,8 @@ class Command(BaseCommand):
             print(f"Updating {user}")
             for permission in ('view', 'add', 'change'):
                 for table in fixed:
+                    if '_ ' in table:
+                        continue
                     print(f"  {permission} {table}")
                     user.user_permissions.add(Permission.objects.get(name=f"Can {permission} {table}"))
 

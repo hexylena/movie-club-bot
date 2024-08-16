@@ -759,11 +759,11 @@ class Command(BaseCommand):
 
     def handle_outstanding(self):
         unprocessed = InPersonMovieSuggestion.objects.filter(processed=False)
+        print("Handling outstanding", unprocessed)
         for up in unprocessed:
             self.send_attend_poll(up)
             up.processed = True
             up.save()
-
 
     def command_dispatch(self, message):
         tennant_id = str(message.chat.id)
@@ -1077,53 +1077,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         def handle_messages(messages):
-
-            #personality_bots = DissociativeIdentityDisorder(bot)
             for message in messages:
+                try:
+                    self.handle_outstanding()
+                except Exception as e:
+                    capture_exception(e)
+                    bot.send_message(
+                        message.chat.id,
+                        f"⚠️ reported to sentry",
+                    )
+
                 # Skip non-text messages
                 if message.text is None:
                     continue
 
                 try:
                     self.command_dispatch(message)
-                except RateLimitError as rle:
-                    bot.send_message(
-                        message.chat.id,
-                        f"⚠️  {rle}",
-                    )
                 except Exception as e:
                     capture_exception(e)
                     bot.send_message(
                         message.chat.id,
                         f"⚠️ reported to sentry",
                     )
-
-                try:
-                    self.handle_outstanding()
-                except RateLimitError as rle:
-                    bot.send_message(
-                        message.chat.id,
-                        f"⚠️  {rle}",
-                    )
-                except Exception as e:
-                    capture_exception(e)
-                    bot.send_message(
-                        message.chat.id,
-                        f"⚠️ reported to sentry",
-                    )
-
-                # Ignore commands
-                # if message.text.startswith('/'):
-                #     continue
-
-                # try:
-                #     personality_bots.process_message(message)
-                # except Exception as e:
-                #     capture_exception(e)
-                #     bot.send_message(
-                #         message.chat.id,
-                #         f"⚠️ reported to sentry",
-                #     )
 
         bot.set_update_listener(handle_messages)
         bot.infinity_polling()

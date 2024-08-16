@@ -187,9 +187,10 @@ def handle_user_response(response):
             )
             ci.save()
     elif poll.poll_type == "event":
-        ipms = MovieSuggestion.objects.get(id=int(poll.metadata))
+        ipms = InPersonMovieSuggestion.objects.get(id=poll.metadata)
         ipms.attendees.add(user)
         ipms.save()
+        bot.send_message(ipms.tennant_id, f"Great! glad you'll be there {user}")
     elif poll.poll_type == "removal":
         # tt8064418__tt7286966__tt4682266 [1] Helena
         tt_id = poll.options.split("__")[option_ids[0]]
@@ -1059,7 +1060,7 @@ class Command(BaseCommand):
         tennant_id = suggestion.tennant_id
 
         options = ["Yea!", "Yes!"]
-        question = "Hey, we're thinking of watching {suggestion}. Are you in?"
+        question = f"Hey, we're thinking of watching {suggestion}. Are you in?"
         r = bot.send_poll(
             tennant_id,
             question=question,

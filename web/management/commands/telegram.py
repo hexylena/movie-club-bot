@@ -1058,7 +1058,7 @@ class Command(BaseCommand):
     def send_attend_poll(self, suggestion):
         tennant_id = suggestion.tennant_id
 
-        options = ["Yeah!"]
+        options = ["Yea!", "Yes!"]
         r = bot.send_poll(
             tennant_id,
             question="Hey, we're thinking of watching {suggestion}. Are you in?",

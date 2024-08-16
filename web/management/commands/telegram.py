@@ -20,6 +20,7 @@ from web.models import (
     AntiInterest,
     Event,
     TelegramGroup,
+    InPersonMovieSuggestion,
 )
 
 import datetime
@@ -759,7 +760,7 @@ class Command(BaseCommand):
     def handle_outstanding(self):
         unprocessed = InPersonMovieSuggestion.objects.filter(processed=False)
         for up in unprocessed:
-            self.send_attend_poll(suggestion)
+            self.send_attend_poll(up)
             up.processed = True
             up.save()
 
@@ -767,15 +768,13 @@ class Command(BaseCommand):
     def command_dispatch(self, message):
         tennant_id = str(message.chat.id)
         chat_name = message.chat.title or message.chat.username
-        tg, created = TelegramGroup.objects.get_or_create(tennant_id=tennant_id, name=chat_name)
+        tg, _ = TelegramGroup.objects.get_or_create(tennant_id=tennant_id, name=chat_name)
 
         # Not sure this is worth the churn?
         tg.count += 1
         if tg.name != chat_name:
             tg.name = chat_name
         tg.save()
-
-        message_s = str(message)
 
         if message.text.startswith("/start") or message.text.startswith("/help"):
             # Do something with the message
@@ -829,7 +828,7 @@ class Command(BaseCommand):
                 factoid = " ".join(parts[1:-1])
                 self.tfm.add_fact(factoid, time.time() + minutes)
             except:
-                bot.send_message("Not recorded, failure.")
+                bot.send_message(message.chat.id, "Not recorded, failure.")
         elif message.text.startswith("/countdown"):
             self.log(tennant_id, "countdown", message.text.split())
             self.countdown(message.chat.id, message.text.split())
@@ -857,12 +856,8 @@ class Command(BaseCommand):
             self.tts(message.text[len('/tts') + 1 :], message, tennant_id)
         elif message.text.startswith("/dumpcontext"):
             self.dumpcontext(message)
-        elif message.text.startswith("/prompt-get-dalle"):
-            self.prompt_get_dalle(message)
         elif message.text.startswith("/issue"):
             self.file_github_issue(message.text[len('/issue') + 1:], message, tennant_id)
-        elif message.text.startswith("/prompt-set-dalle"):
-            self.prompt_set_dalle(message)
         elif message.text.startswith("/prompt-get"):
             self.prompt_get(message)
         elif message.text.startswith("/prompt-set"):
@@ -1021,7 +1016,7 @@ class Command(BaseCommand):
         )
         p.save()
 
-    def wrapped(self):
+    def wrapped(self, message: telebot.types.Message):
         pass
 
     def log(self, tennant_id, key, value=""):

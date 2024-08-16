@@ -185,6 +185,10 @@ def handle_user_response(response):
                 score=interest,
             )
             ci.save()
+    elif poll.poll_type == "event":
+        ipms = MovieSuggestion.objects.get(id=int(poll.metadata))
+        ipms.attendees.add(user)
+        ipms.save()
     elif poll.poll_type == "removal":
         # tt8064418__tt7286966__tt4682266 [1] Helena
         tt_id = poll.options.split("__")[option_ids[0]]
@@ -752,6 +756,14 @@ class Command(BaseCommand):
 
         self.dalle(image_prompt, message, tennant_id)
 
+    def handle_outstanding(self):
+        unprocessed = InPersonMovieSuggestion.objects.filter(processed=False)
+        for up in unprocessed:
+            self.send_attend_poll(suggestion)
+            up.processed = True
+            up.save()
+
+
     def command_dispatch(self, message):
         tennant_id = str(message.chat.id)
         chat_name = message.chat.title or message.chat.username
@@ -1048,6 +1060,26 @@ class Command(BaseCommand):
                 poll_type="rate",
             )
 
+    def send_attend_poll(self, suggestion):
+        tennant_id = suggestion.tennant_id
+
+        options = ["Yeah!"]
+        r = bot.send_poll(
+            tennant_id,
+            question="Hey, we're thinking of watching {suggestion}. Are you in?",
+            options=options,
+            is_anonymous=False
+        )
+        p = PollArbitrary.objects.create(
+            tennant_id=tennant_id,
+            poll_id=r.poll.id,
+            question=question,
+            metadata=str(suggestion.id),
+            options="__".join(options),
+            poll_type="event",
+        )
+        p.save()
+
     def handle(self, *args, **options):
         def handle_messages(messages):
 
@@ -1059,6 +1091,20 @@ class Command(BaseCommand):
 
                 try:
                     self.command_dispatch(message)
+                except RateLimitError as rle:
+                    bot.send_message(
+                        message.chat.id,
+                        f"⚠️  {rle}",
+                    )
+                except Exception as e:
+                    capture_exception(e)
+                    bot.send_message(
+                        message.chat.id,
+                        f"⚠️ reported to sentry",
+                    )
+
+                try:
+                    self.handle_outstanding()
                 except RateLimitError as rle:
                     bot.send_message(
                         message.chat.id,

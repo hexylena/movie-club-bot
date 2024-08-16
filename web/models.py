@@ -86,6 +86,11 @@ class InPersonMovieSuggestion(models.Model):
     theater_location = models.CharField(max_length=10, null=True, blank=True)
     showing_type = models.CharField(max_length=10, null=True, blank=True)
 
+    processed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.title} at {self.theater_datetime.strftime('%A, %H:%M')} in {THEATERS.get(self.theater_location, self.theater_location)}"
+
     @property
     def upcoming(self):
         return self.theater_datetime > now()

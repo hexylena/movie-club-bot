@@ -1059,9 +1059,10 @@ class Command(BaseCommand):
         tennant_id = suggestion.tennant_id
 
         options = ["Yea!", "Yes!"]
+        question = "Hey, we're thinking of watching {suggestion}. Are you in?"
         r = bot.send_poll(
             tennant_id,
-            question="Hey, we're thinking of watching {suggestion}. Are you in?",
+            question=question,
             options=options,
             is_anonymous=False
         )

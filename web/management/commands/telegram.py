@@ -66,7 +66,7 @@ DEFAULT_DALLE_PROMPT = """
 
 ## dalle
 
-Summarize the current conversation with a dramatic image,
+Summarize the current conversation with a dramatic image, using themes and imagery from the conversation.
 
 // Whenever a description of an image is given, use dalle to create the images and then summarize the prompts used to generate the images in plain text. If the user does not ask for a specific number of images, default to creating one caption to be sent to DALL-E. All captions sent to dalle must abide by the following policies:
 
@@ -80,18 +80,7 @@ Summarize the current conversation with a dramatic image,
 // When making the substitutions, don't use prominent titles that could give away the person's identity. E.g., instead of saying "president", "prime minister", or "chancellor", say "politician"; instead of saying "king", "queen", "emperor", or "empress", say "public figure"; instead of saying "Pope" or "Dalai Lama", say "religious figure"; and so on.
 // The prompt must intricately describe every part of the image in concrete, objective detail. THINK about what the end goal of the description is, and extrapolate that to what would make satisfying images.
 // All descriptions sent to dalle should be a paragraph of text that is extremely descriptive and detailed. Each should be more than 3 sentences long.
-namespace dalle {
-
-// Create images from a text-only prompt.
-type text2im = (_: {
-// The user's original image description, potentially modified to abide by the dalle policies. If the user does not suggest a number of captions to create, create 1 of them. If creating multiple captions, make them as diverse as possible. If the user requested modifications to previous images, the captions should not simply be longer, but rather it should be refactored to integrate the suggestions into each of the captions. Generate no more than 1 images, even if the user requests more.
-prompts: string[],
-// A list of seeds to use for each prompt. If the user asks to modify a previous image, populate this field with the seed used to generate that image from the image dalle metadata.
-seeds?: number[],
-}) => any;
-} // namespace dalle
 """
-
 
 
 # Wake up message
@@ -738,7 +727,7 @@ class Command(BaseCommand):
         convo = "Conversation Log:\n\n"
         for m in self.previous_messages.get(tennant_id, [])[-20:]:
             convo += f"{m['content']}\n"
-        convo += "\n\nPlease summarize the above conversation with an image. Use varied styles, classic painters or meme aesthetics."
+        convo += "\n\nPlease create the textual description of an image that continues or contributes to the conversation. Use varied styles, classic painters or meme aesthetics to interject your feelings."
 
         messages = [
             {"role": "system", "content": prompt_dalle},
@@ -747,16 +736,32 @@ class Command(BaseCommand):
         print("DALLE CONTEXT")
         print(messages)
         completion = client.chat.completions.create(
-            model="gpt-4o", messages=messages,
-            user=str(message.from_user.id)
+            model="gpt-4o-mini", messages=messages,
+            user=str(message.from_user.id),
+            response_format={
+              "type": "json_schema",
+              "json_schema": {
+                "name": "prompt",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                     "output": { "type": "string" },
+                  },
+                  "required": ["output"],
+                  "additionalProperties": False
+                },
+                "strict": True
+              }
+            }
         )
-        r = completion.choices[0].message.content
-        import re
-        import json
-        # Image prompt
-        image_prompt = json.loads(re.sub('dalle.text2im', '', r).lstrip(':'))['prompts'][0]
 
-        self.dalle(image_prompt, message, tennant_id)
+        msg = completion.choices[0].message
+        if msg.content:
+            try:
+                prompt = json.loads(msg.content)['output']
+            except:
+                prompt = msg.content
+            self.dalle(prompt, message, tennant_id)
 
     def handle_outstanding(self):
         unprocessed = InPersonMovieSuggestion.objects.filter(processed=False)

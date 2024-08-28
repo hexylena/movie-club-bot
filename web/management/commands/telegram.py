@@ -776,37 +776,19 @@ class Command(BaseCommand):
             tg.name = chat_name
         tg.save()
 
+        args = None
+        command = None
+        if message.text:
+            command = telebot.util.extract_command(message.text)
+            if command:
+                args = telebot.util.extract_arguments(message.text)
+            print(command, args)
+
         if message.text.startswith("/start") or message.text.startswith("/help"):
             # Do something with the message
             bot.reply_to(
                 message,
-                "Howdy, how ya doin\n\n"
-                + "\n".join(
-                    [
-                        "/debug - Show some debug info",
-                        "/status - alias for /debug",
-                        "/passwd - Change your password (DM only.)",
-                        "/countdown [number] - Start a countdown",
-                        "/rate tt<id> - Ask group to rate the film",
-                        "/suggest - Make suggestions for what to watch",
-                        "[imdb link] - add to the database",
-                        "# GPT-3 Specific",
-                        "/ada <text>",
-                        "/babbage <text>",
-                        "/curie <text>",
-                        "/davinci <text>",
-                        "# The Cage Factor",
-                        "/prompt-get - see current prompt",
-                        "/prompt-set - set current prompt",
-                        "/dumpcontext - see current context",
-                        "/dallecontext - Dall·e from the current convo context",
-                        "/dalle <prompt>",
-                        "/chatty - Make cagebot more chatty",
-                        "/shush - Tell him to shush",
-                        "/error - Trigger an error intentionally",
-                        "/fact <text> <minutes> - add a fact for some minutes, last value must parse as an integer.",
-                    ]
-                ),
+                "Howdy, how ya doin' 🤠"
             )
         # Ignore me adding /s later
         elif message.text.startswith("/debug") or  message.text.startswith("/status"):
@@ -1102,6 +1084,22 @@ class Command(BaseCommand):
                     )
 
         bot.set_update_listener(handle_messages)
+        bot.set_my_commands([
+            telebot.types.BotCommand("start", "Starts the bot"),
+            telebot.types.BotCommand("debug", "Shows debug information"),
+            telebot.types.BotCommand("status", "Shows debug information"),
+            telebot.types.BotCommand("passwd", "Get your movie club website password"),
+            telebot.types.BotCommand("countdown", "Starts a countdown, takes an optional number"),
+            telebot.types.BotCommand("rate", "Rate a film you've watched, please provide an IMDB URL"),
+            telebot.types.BotCommand("suggest", "Suggest some films from your database"),
+            telebot.types.BotCommand("suggestnojj", "Suggest some films from your database to watch without JJ whenever he's off playing World of Warcraft"),
+            telebot.types.BotCommand("tts", "Turns the subsequent text into a speech file"),
+            telebot.types.BotCommand("issue", "File an issue"),
+            telebot.types.BotCommand("chatty", "Talk *more*, Cage Bot"),
+            telebot.types.BotCommand("shush", "Say Less!"),
+            telebot.types.BotCommand("dallecontext", "Get a random Dalle image based on current context"),
+            telebot.types.BotCommand("dalle", "Given a query, generate an image for it."),
+        ])
         while True:
             try:
                 bot.infinity_polling()

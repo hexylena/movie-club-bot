@@ -441,7 +441,7 @@ class Command(BaseCommand):
         if not jj:
             unwatched = [x for x in unwatched if not is_jj_interested(x)]
 
-        return unwatched[0:count]
+        return unwatched[0:n]
 
     def suggest_nojj(self, message):
         suggestions = self._obtain_suggestions(

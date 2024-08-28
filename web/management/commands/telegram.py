@@ -373,7 +373,7 @@ class Command(BaseCommand):
 
         msg = "Top suggestions:"
         for film in suggestions:
-            msg += film.str_pretty + "\n"
+            msg += film.str_pretty() + "\n"
         return msg
 
     def suggest(self, message):
@@ -383,7 +383,7 @@ class Command(BaseCommand):
         )[0:3]
         msg = "Top 3 films to watch:\n\n"
         for film in unwatched:
-            msg += film.str_pretty + "\n"
+            msg += film.str_pretty() + "\n"
         bot.send_message(message.chat.id, msg)
 
         films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
@@ -453,7 +453,7 @@ class Command(BaseCommand):
 
         msg = "Top 3 films to watch without JJ:\n\n"
         for film in suggestions:
-            msg += film.str_pretty + "\n"
+            msg += film.str_pretty() + "\n"
         bot.send_message(message.chat.id, msg)
 
         films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])

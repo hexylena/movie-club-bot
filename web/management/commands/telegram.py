@@ -839,12 +839,12 @@ class Command(BaseCommand):
         elif message.text.startswith("/rate"):
             self.log(tennant_id, "rate")
             self.send_rate_poll(message)
-        elif message.text.startswith("/suggest"):
-            self.log(tennant_id, "suggest")
-            self.suggest(message)
         elif message.text.startswith("/suggestnojj"):
             self.log(tennant_id, "suggestnojj")
             self.suggest_nojj(message)
+        elif message.text.startswith("/suggest"):
+            self.log(tennant_id, "suggest")
+            self.suggest(message)
         elif message.text.startswith("/update"):
             self.log(tennant_id, "update")
             self.update_imdb_meta(message)

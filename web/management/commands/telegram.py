@@ -879,7 +879,7 @@ class Command(BaseCommand):
 
             model, short = self.is_gpt3(message.text)
 
-            if model.startswith("gpt-3.5-turbo"):
+            if model == MODEL:
                 self.chatgpt(message.text[len(short) + 1 :], message, tennant_id)
             else:
                 response = client.chat.completions.create(

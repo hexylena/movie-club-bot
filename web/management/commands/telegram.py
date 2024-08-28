@@ -386,9 +386,6 @@ class Command(BaseCommand):
             msg += film.str_pretty() + "\n"
         bot.send_message(message.chat.id, msg)
 
-        films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
-        # self.chatgpt("Hey nick we're thinking of watching one of these three films: {films}. Which do you recommend and why?", message, str(message.chat.id))
-
     def file_github_issue(self, body, message, tennant_id):
         """
         File a new issue on the GitHub repository
@@ -444,8 +441,6 @@ class Command(BaseCommand):
         for film in suggestions:
             msg += film.str_pretty() + "\n"
         bot.send_message(message.chat.id, msg)
-
-        films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
 
     def process_imdb_links(self, message):
         tennant_id = str(message.chat.id)

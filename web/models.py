@@ -265,7 +265,7 @@ class MovieSuggestion(models.Model):
             # Ensure this is non-zero even if we balance it perfectly.
             # Invert JJ's score:
             interests = (sum([
-                i.score if i.user != '824932139' else -i.score
+                i.score if i.user.username != '824932139' else -i.score 
                 for i in self.interest_set.all()
             ]) + 0.5) / 4
 

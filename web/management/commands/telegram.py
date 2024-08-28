@@ -436,7 +436,7 @@ class Command(BaseCommand):
         suggestions = self._obtain_suggestions(
             genre=None,
             tennant_id=str(message.chat.id),
-            jj=True,
+            jj=False,
             n=3,
         )
 

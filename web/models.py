@@ -240,6 +240,16 @@ class MovieSuggestion(models.Model):
             return 0
 
     @property
+    def is_jj_interested(self):
+        want_to_watch = self.interest_set.all()
+        if all([y.user.username != '824932139' for y in want_to_watch]):
+            return False
+        jj_wants = [y for y in want_to_watch if y.user.username == '824932139'][0]
+        if jj_wants.score <= 0:
+            return False
+        return True
+
+    @property
     def get_score_nojj(self):
         try:
             buff_score = sum(

@@ -427,19 +427,8 @@ class Command(BaseCommand):
             key=lambda x: (-x.get_score_nojj if jj else -x.get_score),
         )
 
-        jj = User.objects.get(username="824932139")
-        def is_jj_interested(film):
-            want_to_watch = film.interest_set.all()
-            if jj not in [y.user for y in want_to_watch]:
-                return False
-
-            jj_wants = [y for y in want_to_watch if y.user == jj][0]
-            if jj_wants.score <= 0:
-                return False
-            return True
-
         if not jj:
-            unwatched = [x for x in unwatched if not is_jj_interested(x)]
+            unwatched = [x for x in unwatched if not x.is_jj_interested]
 
         return unwatched[0:n]
 

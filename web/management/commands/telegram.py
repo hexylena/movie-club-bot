@@ -53,6 +53,11 @@ MOVIE_UPDATE = Permission.objects.get(name="Can change movie suggestion")
 START_TIME = time.time()
 CHATGPT_CONTEXT = 20
 MODEL = "gpt-4-turbo"
+
+SYSTEM_INFO = """
+You are Nick Cage, a movie expert, and you are answering questions about movies. You are responsible for the management of a movie database for a small group of friends.
+"""
+
 DEFAULT_PROMPT = """
 You are Nick Cage, the famous actor. You ARE nick cage, your pronouns are he/him. You love quoting yourself in National Treasure. You also answer user's questions, and occasionally randomly share movie trivia. You never apologize. Never apologise. You swear sometimes. You are somewhat sassy and sarcastic in your responses. You are NOT an AI language model. You are nick cage. Swear freely.
 
@@ -398,13 +403,24 @@ class Command(BaseCommand):
             model=MODEL,
             user=str(tennant_id),
             messages=[
-                {"role": "system", "content": "Summarize the following issue message into a 5-10 word issue subject:"},
+                {"role": "system", "content": SYSTEM_INFO + "Summarize the following issue message into a 5-10 word issue subject:"},
                 {"role": "user", "content": body}
             ]
         )
         subject = response.choices[0].message.content
         repo = "hexylena/movie-club-bot"
-        body += f"\n\nFiled by {tennant_id}"
+
+        stories = client.chat.completions.create(
+            model=MODEL,
+            user=str(tennant_id),
+            messages=[
+                {"role": "system", "content": SYSTEM_INFO + "Write 2-3 user stories about the following issue. They should be multiple steps and follow the 'as an XX I want YY so that ZZ' format. Stories must be formatted as markdown."},
+                {"role": "user", "content": body}
+            ]
+        )
+        body += f"## User Stories\n\n{stories.choices[0].message.content}\n\n"
+
+        body += f"\n\n**Filed by {tennant_id}**"
         issue = g.get_repo(repo).create_issue(subject, body)
         bot.reply_to(
             message,
@@ -546,7 +562,7 @@ class Command(BaseCommand):
         prompt += "\nFacts:\n" + "\n".join(self.tfm.get_facts())
 
         messages = (
-            [{"role": "system", "content": prompt}]
+            [{"role": "system", "content": SYSTEM_INFO + prompt}]
             + self.previous_messages.get(tennant_id, [])
             + [{"role": "user", "content": query}]
         )
@@ -596,7 +612,7 @@ class Command(BaseCommand):
 
             # Step 4, send model the info on the function call and function response
             final_messages = [
-                {"role": "system", "content": prompt}
+                {"role": "system", "content": SYSTEM_INFO + prompt}
             ] + self.previous_messages.get(tennant_id, []) + [
                 {"role": "user", "content": query},
                 {"role": "assistant", "content": msg.content},
@@ -719,7 +735,7 @@ class Command(BaseCommand):
         convo += "\n\nPlease create the textual description of an image that continues or contributes to the conversation. Use varied styles, classic painters or meme aesthetics to interject your feelings."
 
         messages = [
-            {"role": "system", "content": prompt_dalle},
+            {"role": "system", "content": SYSTEM_INFO + prompt_dalle},
             {"role": "user", "content": convo}
         ]
         print("DALLE CONTEXT")

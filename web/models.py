@@ -92,6 +92,19 @@ class InPersonMovieSuggestion(models.Model):
         return f"{self.title} at {self.theater_datetime.strftime('%A, %H:%M')} in {THEATERS.get(self.theater_location, self.theater_location)}"
 
     @property
+    def runtime_f(self):
+        if not self.runtime:
+            return "Unknown"
+        hours = self.runtime // 60
+        minutes = self.runtime % 60
+        if hours == 0:
+            return f"{minutes}m"
+        elif minutes == 0:
+            return f"{hours}h"
+        else:
+            return f"{hours}h{minutes}m"
+
+    @property
     def upcoming(self):
         return self.theater_datetime > now()
 
@@ -183,6 +196,19 @@ class MovieSuggestion(models.Model):
         return ''.join([i.score_e for i in self.interest_set.all()])
 
     @property
+    def runtime_f(self):
+        if not self.runtime:
+            return "Unknown"
+        hours = self.runtime // 60
+        minutes = self.runtime % 60
+        if hours == 0:
+            return f"{minutes}m"
+        elif minutes == 0:
+            return f"{hours}h"
+        else:
+            return f"{hours}h{minutes}m"
+
+    @property
     def get_score(self):
         try:
             buff_score = sum(
@@ -207,6 +233,41 @@ class MovieSuggestion(models.Model):
             old = self.days_since_added / 20
             # Ensure this is non-zero even if we balance it perfectly.
             interests = (sum([i.score for i in self.interest_set.all()]) + 0.5) / 4
+
+            return round(interests * (runtime_debuff + buff_score + vote_adj), 2) - old
+        except:
+            # Some things are weird here, dunno why.
+            return 0
+
+    @property
+    def get_score_nojj(self):
+        try:
+            buff_score = sum(
+                [buff.value_adj for buff in self.buffs.all()]
+            )  # could be in db.
+            if self.year < 1990:
+                year_debuff = -1
+            else:
+                year_debuff = 0
+
+            # Exception for unreleased
+            if self.runtime == 0:
+                runtime_debuff = -20 / 10
+            else:
+                runtime_debuff = -1 * abs(self.runtime - 90) / 10
+            # Exception for unreleased
+            if self.ratings > 0:
+                vote_adj = 5 * 5 + year_debuff
+            else:
+                vote_adj = math.log10(self.ratings) * self.rating + year_debuff
+
+            old = self.days_since_added / 20
+            # Ensure this is non-zero even if we balance it perfectly.
+            # Invert JJ's score:
+            interests = (sum([
+                i.score if i.user != '824932139' else -i.score
+                for i in self.interest_set.all()
+            ]) + 0.5) / 4
 
             return round(interests * (runtime_debuff + buff_score + vote_adj), 2) - old
         except:
@@ -371,6 +432,21 @@ class MovieSuggestion(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.year})"
+
+    def str_pretty(self):
+        try:
+            meta = json.loads(self.meta)
+        except:
+            meta = {"description": "(No description available.)"}
+
+        msg = f"{self.title} ({self.year}) {meta['description']}\n"
+        msg += f"  ⭐️{self.rating}\n"
+        msg += f"  ⏰{self.runtime_f}\n"
+        msg += f"  🎬{self.imdb_link}\n"
+        if len(self.get_buffs) > 0:
+            msg += f"  🎟{self.get_buffs}\n"
+        msg += f"  📕{self.genre}\n"
+        return msg
 
 
 class Interest(models.Model):

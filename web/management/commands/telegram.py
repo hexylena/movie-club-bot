@@ -355,7 +355,7 @@ class Command(BaseCommand):
         # todo: fix time.
         pass
 
-    def movie_suggestions(self, count: int=5, genre:str = None, tennant_id: str = "") -> str:
+    def movie_suggestions(self, count: int=5, genre:str = None, tennant_id: str = "", jj: bool = True) -> str:
         """
         List some movies we should watch, based on our watch list.
 
@@ -363,25 +363,17 @@ class Command(BaseCommand):
         :param genre: The genre to filter on, e.g. action or documentary.
         :param tennant_id: The tennant, this will be set automatically
         """
-        args = {
-            'tennant_id': tennant_id,
-            'status': 0,
-        }
-        if genre:
-            args['genre__icontains'] = genre
 
-        unwatched = sorted(
-            MovieSuggestion.objects.filter(**args),
-            key=lambda x: -x.get_score,
-        )[0:count]
+        suggestions = self._obtain_suggestions(
+            genre=genre,
+            tennant_id=tennant_id,
+            jj=jj,
+            n=count,
+        )
+
         msg = "Top suggestions:"
-        for film in unwatched:
-            meta = json.loads(film.meta)
-            msg += f"{film.title} ({film.year}) {meta['description']}\n"
-            msg += f"  ⭐️{film.rating}\n"
-            msg += f"  ⏰{film.runtime}\n"
-            msg += f"  🎬{film.imdb_link}\n"
-            msg += f"  📕{film.genre}\n\n"
+        for film in suggestions:
+            msg += film.str_pretty + "\n"
         return msg
 
     def suggest(self, message):
@@ -391,13 +383,7 @@ class Command(BaseCommand):
         )[0:3]
         msg = "Top 3 films to watch:\n\n"
         for film in unwatched:
-            msg += f"{film.title} ({film.year})\n"
-            msg += f"  ⭐️{film.rating}\n"
-            msg += f"  ⏰{film.runtime}\n"
-            msg += f"  🎬{film.imdb_link}\n"
-            if len(film.get_buffs) > 0:
-                msg += f"  🎟{film.get_buffs}\n"
-            msg += f"  📕{film.genre}\n\n"
+            msg += film.str_pretty + "\n"
         bot.send_message(message.chat.id, msg)
 
         films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
@@ -428,27 +414,46 @@ class Command(BaseCommand):
             f"Filed issue https://github.com/{repo}/issues/{issue.number}"
         )
 
-    def suggest_nojj(self, message):
+    def _obtain_suggestions(self, genre=None, tennant_id="", jj=True, n=3):
+        args = {
+            'tennant_id': tennant_id,
+            'status': 0,
+        }
+        if genre:
+            args['genre__icontains'] = genre
+
         unwatched = sorted(
-            MovieSuggestion.objects.filter(
-                tennant_id=str(message.chat.id), status=0,
-            ),
-            key=lambda x: -x.get_score,
+            MovieSuggestion.objects.filter(**args),
+            key=lambda x: (-x.get_score_nojj if jj else -x.get_score),
         )
+
         jj = User.objects.get(username="824932139")
-        unwatched = [
-            x for x in unwatched
-            if jj not in [y.user for y in x.interest_set.all()]
-        ][0:3]
+        def is_jj_interested(film):
+            want_to_watch = film.interest_set.all()
+            if jj not in [y.user for y in want_to_watch]:
+                return False
+
+            jj_wants = [y for y in want_to_watch if y.user == jj][0]
+            if jj_wants.score <= 0:
+                return False
+            return True
+
+        if not jj:
+            unwatched = [x for x in unwatched if not is_jj_interested(x)]
+
+        return unwatched[0:count]
+
+    def suggest_nojj(self, message):
+        suggestions = self._obtain_suggestions(
+            genre=None,
+            tennant_id=str(message.chat.id),
+            jj=True,
+            n=3,
+        )
+
         msg = "Top 3 films to watch without JJ:\n\n"
-        for film in unwatched:
-            msg += f"{film.title} ({film.year})\n"
-            msg += f"  ⭐️{film.rating}\n"
-            msg += f"  ⏰{film.runtime}\n"
-            msg += f"  🎬{film.imdb_link}\n"
-            if len(film.get_buffs) > 0:
-                msg += f"  🎟{film.get_buffs}\n"
-            msg += f"  📕{film.genre}\n\n"
+        for film in suggestions:
+            msg += film.str_pretty + "\n"
         bot.send_message(message.chat.id, msg)
 
         films = ", ".join([f"{film.title} ({film.year})" for film in unwatched])
@@ -1108,4 +1113,8 @@ class Command(BaseCommand):
                     )
 
         bot.set_update_listener(handle_messages)
-        bot.infinity_polling()
+        while True:
+            try:
+                bot.infinity_polling()
+            except:
+                pass

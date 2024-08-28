@@ -418,7 +418,7 @@ class Command(BaseCommand):
                 {"role": "user", "content": body}
             ]
         )
-        body += f"## User Stories\n\n{stories.choices[0].message.content}\n\n"
+        body += f"\n\n## User Stories\n\n{stories.choices[0].message.content}\n\n"
 
         body += f"\n\n**Filed by {tennant_id}**"
         issue = g.get_repo(repo).create_issue(subject, body)

@@ -241,11 +241,19 @@ class MovieSuggestion(models.Model):
 
     @property
     def is_jj_interested(self):
-        want_to_watch = self.interest_set.all()
-        if all([y.user.username != '824932139' for y in want_to_watch]):
+        return self.is_user_interested('824932139')
+
+    def is_user_interested(self, user: str):
+        if not self.has_user_rated(user):
             return False
-        jj_wants = [y for y in want_to_watch if y.user.username == '824932139'][0]
-        if jj_wants.score <= 0:
+        wants = [y for y in self.interest_set.all() if y.user.username == user][0]
+        if wants.score <= 0:
+            return False
+        return True
+
+    def has_user_rated(self, user: str):
+        want_to_watch = self.interest_set.all()
+        if all([y.user.username != user for y in want_to_watch]):
             return False
         return True
 

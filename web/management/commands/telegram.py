@@ -521,7 +521,20 @@ class Command(BaseCommand):
                 movie.suggested_by = user
                 movie.save()
                 new_count += 1
-                self.send_interest_poll(message, movie)
+                self.send_interest_poll(tennant_id, tennant_id, movie)
+
+    def send_rerate_poll(self):
+        # Find a movie helena didn't watch
+        helenas_unrated = MovieSuggestion.objects.filter(
+            status=0, tennant_id="-627602564"
+        )
+
+        # And send it
+        for unwatched in helenas_unrated:
+            if not unwatched.has_user_rated("195671723"):
+                self.send_interest_poll("195671723", "-627602564", unwatched)
+                break
+
 
     def is_gpt3(self, text):
         if text.startswith("/davinci"):
@@ -858,6 +871,8 @@ class Command(BaseCommand):
             self.prompt_get(message)
         elif message.text.startswith("/prompt-set"):
             self.prompt_set(message)
+        elif message.text.startswith("/rerate"):
+            self.send_rerate_poll()
         elif message.text.startswith("/chatty"):
             self.CHATTINESS[tennant_id] = self.CHATTINESS_ANNOYING
         elif message.text.startswith("/shush") or message.text.startswith("/shhhh"):
@@ -953,15 +968,15 @@ class Command(BaseCommand):
         response = json.dumps(self.previous_messages.get(tennant_id, []), indent=2)
         bot.reply_to(message, response)
 
-    def send_interest_poll(self, message, film):
+    def send_interest_poll(self, to: str, tennant_id: str, film):
         question = f"Do you wanna see {film}?"
         options = ["💯", "🆗", "🤷‍♀️🤷🤷‍♂️ meh", "🤬cinemacraptastic", "🚫veto🙅"]
 
         r = bot.send_poll(
-            message.chat.id, question=question, options=options, is_anonymous=False
+            to, question=question, options=options, is_anonymous=False
         )
         p = Poll.objects.create(
-            tennant_id=str(message.chat.id),
+            tennant_id=tennant_id,
             poll_id=r.poll.id,
             film=film,
             question=question,

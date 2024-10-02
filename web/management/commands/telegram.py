@@ -528,17 +528,17 @@ class Command(BaseCommand):
         # Find a movie helena didn't watch
         helenas_unrated = MovieSuggestion.objects.filter(
             status=0, tennant_id=tennant_id
-        )
+        ).order_by('?')
 
         # And send it
-        for unwatched in helenas_unrated:
-            if not unwatched.has_user_rated(user_id):
+        for film in helenas_unrated:
+            if not film.has_user_rated(user_id):
                 bot.send_message(
                     user_id,
-                    f"{unwatched} has not been rated yet. Please rate it. {unwatched.imdb_link}",
+                    f"You haven't rated '{film}' yet. {film.imdb_link}",
                 )
-                self.send_interest_poll(user_id, tennant_id, unwatched)
-                print(f"Sent rerate to {user_id} for {unwatched}")
+                self.send_interest_poll(user_id, tennant_id, film)
+                print(f"Sent rerate to {user_id} for {film}")
                 break
         else:
             print(f"User {user_id} has rated all movies")

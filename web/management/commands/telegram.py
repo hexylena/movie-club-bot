@@ -523,17 +523,26 @@ class Command(BaseCommand):
                 new_count += 1
                 self.send_interest_poll(tennant_id, tennant_id, movie)
 
-    def send_rerate_poll(self):
+    def send_rerate_poll(self, user_id: str, tennant_id: str):
+        # Just gonna hardcode that. No one else is actually using it.
+        tennant_id = "-627602564"
         # Find a movie helena didn't watch
         helenas_unrated = MovieSuggestion.objects.filter(
-            status=0, tennant_id="-627602564"
+            status=0, tennant_id=tennant_id
         )
 
         # And send it
         for unwatched in helenas_unrated:
-            if not unwatched.has_user_rated("195671723"):
-                self.send_interest_poll("195671723", "-627602564", unwatched)
+            if not unwatched.has_user_rated(user_id):
+                bot.send_message(
+                    user_id,
+                    f"{unwatched} has not been rated yet. Please rate it. {unwatched.imdb_link}",
+                )
+                self.send_interest_poll(user_id, tennant_id, unwatched)
+                print(f"Sent rerate to {user_id} for {unwatched}")
                 break
+        else:
+            print(f"User {user_id} has rated all movies")
 
 
     def is_gpt3(self, text):
@@ -872,7 +881,7 @@ class Command(BaseCommand):
         elif message.text.startswith("/prompt-set"):
             self.prompt_set(message)
         elif message.text.startswith("/rerate"):
-            self.send_rerate_poll()
+            self.send_rerate_poll(message.from_user.id, tennant_id)
         elif message.text.startswith("/chatty"):
             self.CHATTINESS[tennant_id] = self.CHATTINESS_ANNOYING
         elif message.text.startswith("/shush") or message.text.startswith("/shhhh"):
@@ -948,6 +957,12 @@ class Command(BaseCommand):
                 message.chat.type == "private" and not message.from_user.is_bot
             ):
                 self.dalle_context(message.text, message, tennant_id)
+
+            if random.random() < 0.05:
+                rerate_user_id = random.choice(["824932139", "5374276216", "195671723", "15244978", "15244978"])
+                rerate_tennant_id = "-627602564"
+                self.send_rerate_poll(rerate_user_id, rerate_tennant_id)
+
             # elif random.random() < 0.01:
             #     self.tts_context(message.text, message, tennant_id)
 

@@ -253,10 +253,9 @@ class MovieSuggestion(models.Model):
         return True
 
     def has_user_rated(self, user: str):
-        want_to_watch = self.interest_set.all()
-        if all([y.user.username != user for y in want_to_watch]):
-            return False
-        return True
+        v = [y.user.username == user for y in self.interest_set.all()]
+        print("Checking if user has rated {self}: {v}")
+        return any(v)
 
     @property
     def get_score_nojj(self):

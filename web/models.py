@@ -254,7 +254,7 @@ class MovieSuggestion(models.Model):
 
     def has_user_rated(self, user: str):
         v = [y.user.username == user for y in self.interest_set.all()]
-        print("Checking if user has rated {self}: {v}")
+        print(f"Checking if user has rated {self}: {v}")
         return any(v)
 
     @property

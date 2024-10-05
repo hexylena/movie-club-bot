@@ -544,5 +544,8 @@ class UserData(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_data")
     secret_hash = models.CharField(max_length=64, default=lambda: hashlib.sha256().hexdigest())
 
+    def generate_new_hash(self):
+        self.secret_hash = hashlib.sha256().hexdigest()
+
     def __str__(self) -> str:
         return f"{self.user.username}"

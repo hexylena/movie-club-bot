@@ -1,2 +1,4 @@
 /target
 node_modules
+*.pyc
+db.sqlite3

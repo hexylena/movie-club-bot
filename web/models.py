@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from django.utils.timezone import now
 import random
+import hashlib
 import time
 import json
 import isodate
@@ -538,3 +539,10 @@ class Event(models.Model):
     event_id = models.TextField()  # fuck it whatever
     added = models.DateTimeField(auto_now_add=True)
     value = models.TextField()
+
+class UserData(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_data")
+    secret_hash = models.CharField(max_length=64, default=lambda: hashlib.sha256().hexdigest())
+
+    def __str__(self) -> str:
+        return f"{self.user.username}"

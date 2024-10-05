@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+CineMatch
+{% endblock %}
+
+{% block content %}
+<h1>CineMatch</h1>
+
+{% load static %}
+
+{% if movie %}
+<div>
+	<a href="{{ movie.imdb_link }}">{{ movie.title }} ({{ movie.rating}})</a>
+    <p>{{ movie.runtime_f }}</p>
+    <p>{{ movie.genre }}</p>
+    <p>{{ movie.meta.description }}</p>
+</div>
+
+<form action="{% url 'cinematch_post' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="secret" value="{{ secret }}">
+    <input type="hidden" name="tennant_id" value="{{ tennant_id }}">
+    <input type="hidden" name="movie_id" value="{{ movie.pk }}">
+
+    <input type="radio" id="interest_100" name="interest" value="2"><label for="interest_100" >💯</label>
+    <input type="radio" id="interest_ok" name="interest" value="1"><label for="interest_ok" >🆗</label>
+    <input type="radio" id="interest_meh" name="interest" value="0"><label for="interest_meh" >🤷</label>
+    <input type="radio" id="interest_shit" name="interest" value="-1"><label for="interest_shit" >🤬</label>
+    <input type="radio" id="interest_veto" name="interest" value="-2"><label for="interest_veto" >🚫</label>
+    <input type="submit" value="Vote!">
+</form>
+{% else %}
+<h2>No more movies to rate, good job!</h2>
+{% endif %}
+
+{% endblock %}

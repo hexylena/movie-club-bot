@@ -5,10 +5,9 @@ from sentry_sdk import capture_exception
 import time
 from django.contrib.auth.models import User
 from django.utils import timezone
-import traceback
 from django.contrib.auth.models import Permission
-from .personality import DissociativeIdentityDisorder
 import uuid
+from web.models import UserData
 
 
 from web.models import (
@@ -920,6 +919,8 @@ class Command(BaseCommand):
                 bot.reply_to(
                     message, "Prompt: " + message.text[len(short) + 1 :] + gpt3_text
                 )
+        elif message.text.startswith("/cinematch"):
+            self.generate_cinematch(message.from_user, message.chat.id) 
         elif message.text.startswith("/"):
             bot.send_message(
                 message.chat.id,
@@ -1101,6 +1102,25 @@ class Command(BaseCommand):
             poll_type="event",
         )
         p.save()
+
+    def generate_cinematch(self, user, chat_id):
+        user = find_user(user)
+
+        user_data = UserData.objects.filter(user=user).first()
+        if not user_data:
+            user_data = UserData.objects.create(user=user)
+        else:
+            user_data.generate_new_hash()
+            user_data.save()
+        
+        tennant_id = -627602564  # TODO booo hardcoded to bestest group
+
+        bot.send_message(
+            chat_id, (
+                f"Generated new CineMatch secret, start rating here:\n"
+                "https://movie-club-bot.app.galaxians.org/cm/{tennant_id}/{user_data.secret_hash}"
+            )
+        )
 
     def handle(self, *args, **options):
         def handle_messages(messages):

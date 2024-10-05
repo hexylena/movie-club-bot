@@ -70,3 +70,8 @@ class InPersonMovieSuggestionAdmin(admin.ModelAdmin):
     list_display = ("id", "theater_datetime", "theater_location")
 
 admin.site.register(InPersonMovieSuggestion, InPersonMovieSuggestionAdmin)
+
+class UserDataAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(UserData, UserDataAdmin)

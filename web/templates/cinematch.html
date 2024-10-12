@@ -19,11 +19,19 @@ CineMatch
                 
                 <div class="row">  <!-- meta data -->
                     <div class="col">
-                        <div class="row"><a class="h2" href="{{ movie.imdb_link }}">{{ movie.title }} ({{ movie.rating }}/{{ movie.ratings }})</a></div>
+                        <div class="row"><a class="h2 text-primary" href="{{ movie.imdb_link }}">{{ movie.title }} ({{ movie.rating }}/{{ movie.ratings }})</a></div>
                         <div class="h4">{{ movie.runtime_f }}</div>
                         <div class="h6">{{ movie.genre }}</div>
                         <div>{{ movie.meta.description }}</div>
                     </div>
+                </div>
+
+                <div class="row">
+                    {% if poster_url %}
+                        <img src="{{ poster_url }}" class="rounded mx-auto d-block" alt="poster">
+                    {% else %}
+                        <div class="h6 text-danger">Could not fetch poster</div>
+                    {% endif %}
                 </div>
                 
                 <div class="row">  <!-- voting -->

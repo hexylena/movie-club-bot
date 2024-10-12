@@ -22,6 +22,8 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 
+from web import utils
+
 START_TIME = time.time()
 
 
@@ -364,10 +366,15 @@ def cinematch(request: HttpRequest, acct: str, secret: str):
 
     # TODO maybe order by -rating, but can't be done in db ?
 
+    movie = movies.first()
+
+    poster_url = utils.get_movie_poster_url_from_tmdb(movie)
+
     template = loader.get_template("cinematch.html")
     return HttpResponse(template.render({
-        "movie": movies.first(),
+        "movie": movie,
         "movie_count": movies.count(),
+        "poster_url": poster_url,
         "tennant_id": acct,
         "secret": secret
     }, request))

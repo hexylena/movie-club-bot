@@ -247,7 +247,6 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dj-database-url" },
     { name = "django" },
-    { name = "psycopg2" },
     { name = "whitenoise" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0f/04/226d82630d560afbe3b8b6e204c397bc3e55c26b851d6d2abb7a85e1a72a/django-heroku-0.3.1.tar.gz", hash = "sha256:6af4bc3ae4a9b55eaad6dbe5164918982d2762661aebc9f83d9fa49f6009514e", size = 5236 }
@@ -474,20 +473,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/20/2ff69ad9c35c3df1858ac4e094f20bd2374d33c8643cf41da8fd7cdcb78b/psutil-6.0.0-cp37-abi3-win32.whl", hash = "sha256:a495580d6bae27291324fe60cea0b5a7c23fa36a7cd35035a16d93bdcf076b9d", size = 253560 },
     { url = "https://files.pythonhosted.org/packages/73/44/561092313ae925f3acfaace6f9ddc4f6a9c748704317bad9c8c8f8a36a79/psutil-6.0.0-cp37-abi3-win_amd64.whl", hash = "sha256:33ea5e1c975250a720b3a6609c490db40dae5d83a4eb315170c4fe0d8b1f34b3", size = 257399 },
     { url = "https://files.pythonhosted.org/packages/7c/06/63872a64c312a24fb9b4af123ee7007a306617da63ff13bcc1432386ead7/psutil-6.0.0-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:ffe7fc9b6b36beadc8c322f84e1caff51e8703b88eee1da46d1e3a6ae11b4fd0", size = 251988 },
-]
-
-[[package]]
-name = "psycopg2"
-version = "2.9.9"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c9/5e/dc6acaf46d78979d6b03458b7a1618a68e152a6776fce95daac5e0f0301b/psycopg2-2.9.9.tar.gz", hash = "sha256:d1454bde93fb1e224166811694d600e746430c006fbb031ea06ecc2ea41bf156", size = 384926 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/14/2767d963915f957c07f5d4c3d9c5c9a407415289f5cde90b82cb3e8c2a12/psycopg2-2.9.9-cp310-cp310-win32.whl", hash = "sha256:38a8dcc6856f569068b47de286b472b7c473ac7977243593a288ebce0dc89516", size = 1025172 },
-    { url = "https://files.pythonhosted.org/packages/bc/bc/6572dec6834e779668421e25f8812a872d978e241f85491a5e4dda606a98/psycopg2-2.9.9-cp310-cp310-win_amd64.whl", hash = "sha256:426f9f29bde126913a20a96ff8ce7d73fd8a216cfb323b1f04da402d452853c3", size = 1163569 },
-    { url = "https://files.pythonhosted.org/packages/91/2c/1fc5b9d33cd248c548ba19f2cef8e89cabaafab9858a602868a592cdc1b0/psycopg2-2.9.9-cp311-cp311-win32.whl", hash = "sha256:ade01303ccf7ae12c356a5e10911c9e1c51136003a9a1d92f7aa9d010fb98372", size = 1024163 },
-    { url = "https://files.pythonhosted.org/packages/37/2c/5133dd3183a3bd82371569f0dd783e6927672de7e671b278ce248810b7f7/psycopg2-2.9.9-cp311-cp311-win_amd64.whl", hash = "sha256:121081ea2e76729acfb0673ff33755e8703d45e926e416cb59bae3a86c6a4981", size = 1163579 },
-    { url = "https://files.pythonhosted.org/packages/13/13/f74ffe6b6f58822e807c70391dc5679a53feb92ce119ccb8a6546c3fb893/psycopg2-2.9.9-cp312-cp312-win32.whl", hash = "sha256:d735786acc7dd25815e89cc4ad529a43af779db2e25aa7c626de864127e5a024", size = 1024634 },
-    { url = "https://files.pythonhosted.org/packages/58/4b/c4a26e191882b60150bfcb639e416524ae7f8249ab7ee854fb5247f16c40/psycopg2-2.9.9-cp312-cp312-win_amd64.whl", hash = "sha256:a7653d00b732afb6fc597e29c50ad28087dcb4fbfb28e86092277a559ae4e693", size = 1163789 },
 ]
 
 [[package]]

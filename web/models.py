@@ -345,6 +345,13 @@ class MovieSuggestion(models.Model):
     @property
     def imdb_link(self):
         return f"https://www.imdb.com/title/{self.imdb_id}/"
+    
+    @property
+    def description(self):
+        try:
+            return json.loads(self.meta)["description"]
+        except:
+            return "(No description available.)"
 
     def update_from_imdb(self):
         movie_details = get_ld_json(f"https://www.imdb.com/title/{self.imdb_id}/")
@@ -453,12 +460,7 @@ class MovieSuggestion(models.Model):
         return f"{self.title} ({self.year})"
 
     def str_pretty(self):
-        try:
-            meta = json.loads(self.meta)
-        except:
-            meta = {"description": "(No description available.)"}
-
-        msg = f"{self.title} ({self.year}) {meta['description']}\n"
+        msg = f"{self.title} ({self.year}) {self.description}\n"
         msg += f"  ⭐️{self.rating}\n"
         msg += f"  ⏰{self.runtime_f}\n"
         msg += f"  🎬{self.imdb_link}\n"

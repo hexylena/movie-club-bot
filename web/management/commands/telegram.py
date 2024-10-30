@@ -1126,7 +1126,7 @@ class Command(BaseCommand):
         bot.reply_to(
             message, (
                 f"Generated new CineMatch secret, start rating here:\n"
-                "https://movie-club-bot.app.galaxians.org/cinematch/{tennant_id}/auth/{user_data.secret_hash}"
+                f"https://movie-club-bot.app.galaxians.org/cinematch/{tennant_id}/auth/{user_data.secret_hash}"
             )
         )
 

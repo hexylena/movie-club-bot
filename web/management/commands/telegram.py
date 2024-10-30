@@ -920,7 +920,7 @@ class Command(BaseCommand):
                     message, "Prompt: " + message.text[len(short) + 1 :] + gpt3_text
                 )
         elif message.text.startswith("/cinematch"):
-            self.generate_cinematch(message.from_user, message.chat.id) 
+            self.generate_cinematch(message) 
         elif message.text.startswith("/"):
             bot.send_message(
                 message.chat.id,
@@ -1103,13 +1103,13 @@ class Command(BaseCommand):
         )
         p.save()
 
-    def generate_cinematch(self, user, chat_id):
+    def generate_cinematch(self, message):
         # Only private chats are permitted, so we don't post a CineMatch secret
         # to a public channel 👀
         if message.chat.type != "private":
             return
 
-        user = find_user(user)
+        user = find_user(message.from_user)
 
         user_data = UserData.objects.filter(user=user).first()
         if not user_data:
@@ -1120,8 +1120,8 @@ class Command(BaseCommand):
 
         tennant_id = -627602564  # TODO booo hardcoded to bestest group
 
-        bot.send_message(
-            chat_id, (
+        bot.reply_to(
+            message, (
                 f"Generated new CineMatch secret, start rating here:\n"
                 "https://movie-club-bot.app.galaxians.org/cinematch/{tennant_id}/auth/{user_data.secret_hash}"
             )

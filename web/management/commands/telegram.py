@@ -1157,6 +1157,7 @@ class Command(BaseCommand):
             telebot.types.BotCommand("start", "Starts the bot"),
             telebot.types.BotCommand("debug", "Shows debug information"),
             telebot.types.BotCommand("status", "Shows debug information"),
+            telebot.types.BotCommand("cinematch", "Generate your CineMatch URL. It's tinder, for movies!"),
             telebot.types.BotCommand("passwd", "Get your movie club website password"),
             telebot.types.BotCommand("countdown", "Starts a countdown, takes an optional number"),
             telebot.types.BotCommand("rate", "Rate a film you've watched, please provide an IMDB URL"),

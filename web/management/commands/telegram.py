@@ -1104,6 +1104,11 @@ class Command(BaseCommand):
         p.save()
 
     def generate_cinematch(self, user, chat_id):
+        # Only private chats are permitted, so we don't post a CineMatch secret
+        # to a public channel 👀
+        if message.chat.type != "private":
+            return
+
         user = find_user(user)
 
         user_data = UserData.objects.filter(user=user).first()

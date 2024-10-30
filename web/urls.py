@@ -15,8 +15,9 @@ urlpatterns = [
     path("t/<acct>/irl", views.irl_movie, name="irl"),
     path("t/<acct>/schedule", views.schedule, name="schedule"),
     path("t/<acct_uuid>/schedule.ics", views.schedule_ical, name="schedule_ical"),
-    path("cm/<acct>/<secret>", views.cinematch, name="cinematch"),
-    path("cmp", views.cinematch_post, name="cinematch_post"),
+    path("cinematch/<acct>/auth/<secret>", views.cinematch_auth, name="cinematch_auth"),
+    path("cinematch/<acct>", views.cinematch, name="cinematch"),
+    path("cinematch/<acct>/post", views.cinematch_post, name="cinematch_post"),
 
     path("status", views.status, name="status"),
     path("manifest.json", views.manifest, name="manifest"),

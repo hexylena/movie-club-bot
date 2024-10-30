@@ -1117,13 +1117,13 @@ class Command(BaseCommand):
         else:
             user_data.generate_new_hash()
             user_data.save()
-        
+
         tennant_id = -627602564  # TODO booo hardcoded to bestest group
 
         bot.send_message(
             chat_id, (
                 f"Generated new CineMatch secret, start rating here:\n"
-                "https://movie-club-bot.app.galaxians.org/cm/{tennant_id}/{user_data.secret_hash}"
+                "https://movie-club-bot.app.galaxians.org/cinematch/{tennant_id}/auth/{user_data.secret_hash}"
             )
         )
 

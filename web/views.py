@@ -6,6 +6,7 @@ from .forms import *
 from .models import MovieSuggestion, TelegramGroup, Event, Interest
 from django.template import loader
 import requests
+from django.contrib.auth import authenticate, login, logout
 import datetime
 import time
 import glob
@@ -352,10 +353,18 @@ def manifest(request):
 
     return JsonResponse(manifest)
 
-@csrf_protect
-def cinematch(request: HttpRequest, acct: str, secret: str):
+def cinematch_auth(request: HttpRequest, acct: str, secret: str):
     user_data = get_object_or_404(UserData, secret_hash=secret)
     user = user_data.user
+    # Log the user in using the Django accounts system
+    login(request, user)
+    return redirect("cinematch", acct=acct)
+
+
+@csrf_protect
+@login_required
+def cinematch(request: HttpRequest, acct: str):
+    user = request.user
 
     movies = MovieSuggestion.objects.filter(
         tennant_id=acct, 
@@ -376,15 +385,12 @@ def cinematch(request: HttpRequest, acct: str, secret: str):
         "movie_count": movies.count(),
         "poster_url": poster_url,
         "tennant_id": acct,
-        "secret": secret
     }, request))
 
-def cinematch_post(request: HttpRequest):
-    secret = request.POST.get("secret", "")
-    user_data = get_object_or_404(UserData, secret_hash=secret)
-    user = user_data.user
+def cinematch_post(request: HttpRequest, acct: str):
+    user = request.user
+    tennant_id = acct
 
-    tennant_id = request.POST.get("tennant_id", "")
     if MovieSuggestion.objects.filter(tennant_id=tennant_id).count() == 0:
         raise Http404("Tennant not found")
     
@@ -409,7 +415,7 @@ def cinematch_post(request: HttpRequest):
         film=movie,
         score=interest
     )
-    return redirect("cinematch", acct=tennant_id, secret=secret)
+    return redirect("cinematch", acct=tennant_id)
 
 
 def static_file(request, path):

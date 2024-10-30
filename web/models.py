@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from django.utils.timezone import now
 import random
+import hashlib
 import time
 import json
 import isodate
@@ -344,6 +345,13 @@ class MovieSuggestion(models.Model):
     @property
     def imdb_link(self):
         return f"https://www.imdb.com/title/{self.imdb_id}/"
+    
+    @property
+    def description(self):
+        try:
+            return json.loads(self.meta)["description"]
+        except:
+            return "(No description available.)"
 
     def update_from_imdb(self):
         movie_details = get_ld_json(f"https://www.imdb.com/title/{self.imdb_id}/")
@@ -452,12 +460,7 @@ class MovieSuggestion(models.Model):
         return f"{self.title} ({self.year})"
 
     def str_pretty(self):
-        try:
-            meta = json.loads(self.meta)
-        except:
-            meta = {"description": "(No description available.)"}
-
-        msg = f"{self.title} ({self.year}) {meta['description']}\n"
+        msg = f"{self.title} ({self.year}) {self.description}\n"
         msg += f"  ⭐️{self.rating}\n"
         msg += f"  ⏰{self.runtime_f}\n"
         msg += f"  🎬{self.imdb_link}\n"
@@ -538,3 +541,13 @@ class Event(models.Model):
     event_id = models.TextField()  # fuck it whatever
     added = models.DateTimeField(auto_now_add=True)
     value = models.TextField()
+
+class UserData(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_data")
+    secret_hash = models.CharField(max_length=64, default=lambda: hashlib.sha256().hexdigest())
+
+    def generate_new_hash(self):
+        self.secret_hash = hashlib.sha256().hexdigest()
+
+    def __str__(self) -> str:
+        return f"{self.user.username}"

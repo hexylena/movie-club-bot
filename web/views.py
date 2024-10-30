@@ -3,9 +3,10 @@ import re
 from django.conf import settings
 import collections
 from .forms import *
-from .models import MovieSuggestion, TelegramGroup, Event
+from .models import MovieSuggestion, TelegramGroup, Event, Interest
 from django.template import loader
 import requests
+from django.contrib.auth import authenticate, login, logout
 import datetime
 import time
 import glob
@@ -13,13 +14,16 @@ import os
 import statistics
 import collections
 import datetime
-import copy
 import pytz
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest, Http404
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_protect
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
+
+from web import utils
 
 START_TIME = time.time()
 
@@ -348,6 +352,71 @@ def manifest(request):
     }
 
     return JsonResponse(manifest)
+
+def cinematch_auth(request: HttpRequest, acct: str, secret: str):
+    user_data = get_object_or_404(UserData, secret_hash=secret)
+    user = user_data.user
+    # Log the user in using the Django accounts system
+    login(request, user)
+    return redirect("cinematch", acct=acct)
+
+
+@csrf_protect
+@login_required
+def cinematch(request: HttpRequest, acct: str):
+    user = request.user
+
+    movies = MovieSuggestion.objects.filter(
+        tennant_id=acct, 
+        status=0,
+    ).filter(
+        ~Q(interest__user__pk__contains=user.pk)
+    ).all()
+
+    # TODO maybe order by -rating, but can't be done in db ?
+
+    movie = movies.first()
+
+    poster_url = utils.get_movie_poster_url_from_tmdb(movie)
+
+    template = loader.get_template("cinematch.html")
+    return HttpResponse(template.render({
+        "movie": movie,
+        "movie_count": movies.count(),
+        "poster_url": poster_url,
+        "tennant_id": acct,
+    }, request))
+
+def cinematch_post(request: HttpRequest, acct: str):
+    user = request.user
+    tennant_id = acct
+
+    if MovieSuggestion.objects.filter(tennant_id=tennant_id).count() == 0:
+        raise Http404("Tennant not found")
+    
+    movie_id = request.POST.get("movie_id", "")
+    movie = get_object_or_404(MovieSuggestion, pk=movie_id)
+    
+    interest = request.POST.get("interest", "")
+    if interest == "":
+        raise Http404("Need a vote!")
+    
+    try:
+        interest = int(interest)
+    except ValueError as e:
+        raise Http404("Not a valid vote!")
+    
+    if interest not in [2, 1, 0 , -1, -2]:
+        raise Http404("Sneaky sneaky")
+    
+    Interest.objects.create(
+        tennant_id = tennant_id,
+        user=user,
+        film=movie,
+        score=interest
+    )
+    return redirect("cinematch", acct=tennant_id)
+
 
 def static_file(request, path):
     if not re.match(r'^[0-9.-]+$', path):

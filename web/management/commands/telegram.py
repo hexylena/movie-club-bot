@@ -5,10 +5,9 @@ from sentry_sdk import capture_exception
 import time
 from django.contrib.auth.models import User
 from django.utils import timezone
-import traceback
 from django.contrib.auth.models import Permission
-from .personality import DissociativeIdentityDisorder
 import uuid
+from web.models import UserData
 
 
 from web.models import (
@@ -920,6 +919,8 @@ class Command(BaseCommand):
                 bot.reply_to(
                     message, "Prompt: " + message.text[len(short) + 1 :] + gpt3_text
                 )
+        elif message.text.startswith("/cinematch"):
+            self.generate_cinematch(message.from_user, message.chat.id) 
         elif message.text.startswith("/"):
             bot.send_message(
                 message.chat.id,
@@ -1102,6 +1103,30 @@ class Command(BaseCommand):
         )
         p.save()
 
+    def generate_cinematch(self, user, chat_id):
+        # Only private chats are permitted, so we don't post a CineMatch secret
+        # to a public channel 👀
+        if message.chat.type != "private":
+            return
+
+        user = find_user(user)
+
+        user_data = UserData.objects.filter(user=user).first()
+        if not user_data:
+            user_data = UserData.objects.create(user=user)
+        else:
+            user_data.generate_new_hash()
+            user_data.save()
+
+        tennant_id = -627602564  # TODO booo hardcoded to bestest group
+
+        bot.send_message(
+            chat_id, (
+                f"Generated new CineMatch secret, start rating here:\n"
+                "https://movie-club-bot.app.galaxians.org/cinematch/{tennant_id}/auth/{user_data.secret_hash}"
+            )
+        )
+
     def handle(self, *args, **options):
         def handle_messages(messages):
             for message in messages:
@@ -1132,6 +1157,7 @@ class Command(BaseCommand):
             telebot.types.BotCommand("start", "Starts the bot"),
             telebot.types.BotCommand("debug", "Shows debug information"),
             telebot.types.BotCommand("status", "Shows debug information"),
+            telebot.types.BotCommand("cinematch", "Generate your CineMatch URL. It's tinder, for movies!"),
             telebot.types.BotCommand("passwd", "Get your movie club website password"),
             telebot.types.BotCommand("countdown", "Starts a countdown, takes an optional number"),
             telebot.types.BotCommand("rate", "Rate a film you've watched, please provide an IMDB URL"),

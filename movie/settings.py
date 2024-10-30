@@ -28,7 +28,9 @@ if 'SECRET_KEY' in os.environ:
 else:
     SECRET_KEY = 'django-insecure-klq30g*r^s_#$7^%(dr0&s6o15$gvb2*!(jhsaz@oeir@+$^!i'
 
-ALLOWED_HOSTS = ['movie-club-bot.app.galaxians.org', 'localhost']
+TMDB_API_KEY = os.environ["TMDB_API_KEY"]
+
+ALLOWED_HOSTS = ['movie-club-bot.app.galaxians.org', 'localhost', "127.0.0.1"]
 
 IS_HEROKU = "DYNO" in os.environ
 

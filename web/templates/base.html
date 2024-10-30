@@ -29,6 +29,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarColor01">
       <ul class="navbar-nav me-auto">
+	{% if request.user.is_authenticated %}
+	<li class="nav-item"><a class="nav-link" href="/admin/">Welcome {{ request.user }}!</a></li>
+	{% endif %}
         <li class="nav-item">
           <a class="nav-link" href="/">Home</a>
         </li>

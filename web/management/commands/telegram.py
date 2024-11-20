@@ -987,7 +987,7 @@ class Command(BaseCommand):
         bot.reply_to(message, response)
 
     def send_interest_poll(self, to: str, tennant_id: str, film):
-        question = f"Do you wanna see {film}?"
+        question = f"Do you wanna see {film}? Suggested by {film.suggested_by} on {film.added.strftime('%B %m, %Y')}."
         options = ["💯", "🆗", "🤷‍♀️🤷🤷‍♂️ meh", "🤬cinemacraptastic", "🚫veto🙅", "😎 already seen"]
 
         r = bot.send_poll(

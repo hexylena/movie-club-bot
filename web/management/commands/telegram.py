@@ -1071,7 +1071,7 @@ class Command(BaseCommand):
 
             question = f"What did you think of {film}? Give it a rating."
             #options = ["0", "⭐️", "⭐️⭐️", "⭐️⭐️⭐️", "⭐️⭐️⭐️⭐️", "⭐️⭐️⭐️⭐️⭐️"]
-            options = ["⯪☆☆☆☆","★☆☆☆☆","★⯪☆☆☆","★★☆☆☆","★★⯪☆☆","★★★☆☆","★★★⯪☆","★★★★☆","★★★★⯪","★★★★★"]
+            options = ["☆☆☆☆☆","★☆☆☆☆","★⯪☆☆☆","★★☆☆☆","★★⯪☆☆","★★★☆☆","★★★⯪☆","★★★★☆","★★★★⯪","★★★★★"]
 
             r = bot.send_poll(
                 message.chat.id, question=question, options=options, is_anonymous=False

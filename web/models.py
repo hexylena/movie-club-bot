@@ -283,7 +283,7 @@ class MovieSuggestion(models.Model):
             # Ensure this is non-zero even if we balance it perfectly.
             # Invert JJ's score:
             interests = (sum([
-                i.score if i.user.username != '824932139' else -i.score 
+                i.score if i.user.username != '824932139' else -i.score
                 for i in self.interest_set.all()
             ]) + 0.5) / 4
 
@@ -344,7 +344,7 @@ class MovieSuggestion(models.Model):
     @property
     def imdb_link(self):
         return f"https://www.imdb.com/title/{self.imdb_id}/"
-    
+
     @property
     def description(self):
         try:
@@ -486,6 +486,8 @@ class Interest(models.Model):
             0: "🤷",
             -1: "🤬",
             -2: "🚫",
+            -3: "😎"
+
         }.get(self.score, "?")
 
     def __str__(self):

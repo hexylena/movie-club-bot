@@ -139,7 +139,9 @@ def handle_user_response(response):
 
     if poll.poll_type == "rate":
         film = poll.film
-        critic_rating = option_ids[0]
+        critic_rating = option_ids[0]+1
+        if critic_rating == 1:
+           critic_rating = 0
 
         print(user_id, poll_id, option_ids, poll)
         try:
@@ -920,7 +922,7 @@ class Command(BaseCommand):
                     message, "Prompt: " + message.text[len(short) + 1 :] + gpt3_text
                 )
         elif message.text.startswith("/cinematch"):
-            self.generate_cinematch(message) 
+            self.generate_cinematch(message)
         elif message.text.startswith("/"):
             bot.send_message(
                 message.chat.id,
@@ -986,7 +988,7 @@ class Command(BaseCommand):
 
     def send_interest_poll(self, to: str, tennant_id: str, film):
         question = f"Do you wanna see {film}?"
-        options = ["💯", "🆗", "🤷‍♀️🤷🤷‍♂️ meh", "🤬cinemacraptastic", "🚫veto🙅"]
+        options = ["💯", "🆗", "🤷‍♀️🤷🤷‍♂️ meh", "🤬cinemacraptastic", "🚫veto🙅", "😎 already seen"]
 
         r = bot.send_poll(
             to, question=question, options=options, is_anonymous=False
@@ -1068,7 +1070,8 @@ class Command(BaseCommand):
             film.save()
 
             question = f"What did you think of {film}? Give it a rating."
-            options = ["0", "⭐️", "⭐️⭐️", "⭐️⭐️⭐️", "⭐️⭐️⭐️⭐️", "⭐️⭐️⭐️⭐️⭐️"]
+            #options = ["0", "⭐️", "⭐️⭐️", "⭐️⭐️⭐️", "⭐️⭐️⭐️⭐️", "⭐️⭐️⭐️⭐️⭐️"]
+            options = ["⯪☆☆☆☆","★☆☆☆☆","★⯪☆☆☆","★★☆☆☆","★★⯪☆☆","★★★☆☆","★★★⯪☆","★★★★☆","★★★★⯪","★★★★★"]
 
             r = bot.send_poll(
                 message.chat.id, question=question, options=options, is_anonymous=False

@@ -1089,7 +1089,7 @@ class Command(BaseCommand):
         tennant_id = suggestion.tennant_id
 
         options = ["Yea!", "Yes!"]
-        question = f"Hey, we're thinking of watching {suggestion}. Are you in?"
+        question = f"Hey, we're thinking of watching {suggestion}. Are you in? (This will send you a reminder message on the day of)"
         r = bot.send_poll(
             tennant_id,
             question=question,

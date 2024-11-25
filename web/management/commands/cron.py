@@ -30,7 +30,7 @@ class Command(BaseCommand):
             print(f"{suggestion} is in {suggestion.theater_datetime - now}")
             hours_until = suggestion.theater_datetime - now
 
-            msg = f"Reminder: We're seeing {suggestion} tonight!"
+            msg = f"Reminder: We're seeing {suggestion} tonight! ({hours_until} from now)"
             if suggestion.needs_glasses:
                 msg += " Don't forget your {suggestion.showing_type} glasses!"
 

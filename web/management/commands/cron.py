@@ -38,9 +38,12 @@ class Command(BaseCommand):
                 # Gross
                 msg = msg.replace("tonight!", "tomorrow night!")
                 bot.send_message(suggestion.tennant_id, msg)
+
                 for user in suggestion.attendees.all():
-                    bot.send_message(user.username, msg)
+                    print(f"Sending message to {user.username}")
+                    # bot.send_message(user.username, msg)
             elif hours_until < datetime.timedelta(hours=9) and hours_until > datetime.timedelta(hours=8):
                 bot.send_message(suggestion.tennant_id, msg)
                 for user in suggestion.attendees.all():
-                    bot.send_message(user.username, msg)
+                    print(f"Sending message to {user.username}")
+                    # bot.send_message(user.username, msg)

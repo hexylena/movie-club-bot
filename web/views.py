@@ -91,9 +91,9 @@ def irl_movie(request, acct):
         form = InPersonMovieSuggestionForm(request.POST)
         print(form, form.is_valid())
         if form.is_valid():
+            model.tennant_id = acct
             model = form.save()
             model.update_from_imdb()
-            model.tennant_id = acct
             return redirect('schedule', acct=acct)
     else:
         form = InPersonMovieSuggestionForm()

@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 import os
+from django.utils import timezone
 import datetime
 import web.models
 import telebot
@@ -20,7 +21,7 @@ class Command(BaseCommand):
             time.sleep(3600)
 
     def send_messages(self):
-        now = datetime.datetime.now()
+        now = timezone.now()
         for suggestion in web.models.InPersonMovieSuggestion.objects.filter(theater_datetime__gte=now):
             print(f"{suggestion} is in {suggestion.theater_datetime - now}")
             hours_until = suggestion.theater_datetime - now

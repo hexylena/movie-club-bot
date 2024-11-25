@@ -352,6 +352,14 @@ class MovieSuggestion(models.Model):
         except:
             return "(No description available.)"
 
+    @property
+    def actors(self):
+        try:
+            actors = json.loads(self.meta)["actor"]
+            return ', '.join([actor["name"] for actor in actors])
+        except:
+            return "(No actors known.)"
+
     def update_from_imdb(self):
         movie_details = get_ld_json(f"https://www.imdb.com/title/{self.imdb_id}/")
 
@@ -460,6 +468,7 @@ class MovieSuggestion(models.Model):
 
     def str_pretty(self):
         msg = f"{self.title} ({self.year}) {self.description}\n"
+        msg += f"{self.actors}\n"
         msg += f"  ⭐️{self.rating}\n"
         msg += f"  ⏰{self.runtime_f}\n"
         msg += f"  🎬{self.imdb_link}\n"

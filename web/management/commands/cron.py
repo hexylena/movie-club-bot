@@ -16,9 +16,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         while True:
             print(f"Scheduling reminders at {datetime.datetime.now()}")
-            self.send_messages()
-            # We'll never see a movie around the date/time change, right? RIGHT??
-            time.sleep(3600)
+            try:
+                self.send_messages()
+            except Exception as e:
+                print(f"Error: {e}")
+            finally:
+                # We'll never see a movie around the date/time change, right? RIGHT??
+                time.sleep(3600)
 
     def send_messages(self):
         now = timezone.now()
@@ -32,12 +36,11 @@ class Command(BaseCommand):
 
             if hours_until < datetime.timedelta(hours=24) and hours_until > datetime.timedelta(hours=23):
                 # Gross
-                msg.replace("tonight!", "tomorrow night!")
+                msg = msg.replace("tonight!", "tomorrow night!")
                 bot.send_message(suggestion.tennant_id, msg)
                 for user in suggestion.attendees.all():
-                    bot.send_message(user.telegram_id, msg)
-
-            if hours_until < datetime.timedelta(hours=9) and hours_until > datetime.timedelta(hours=8):
+                    bot.send_message(user.username, msg)
+            elif hours_until < datetime.timedelta(hours=9) and hours_until > datetime.timedelta(hours=8):
                 bot.send_message(suggestion.tennant_id, msg)
                 for user in suggestion.attendees.all():
-                    bot.send_message(user.telegram_id, msg)
+                    bot.send_message(user.username, msg)

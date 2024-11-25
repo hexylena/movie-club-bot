@@ -356,7 +356,7 @@ class MovieSuggestion(models.Model):
     def actors(self):
         try:
             actors = json.loads(self.meta)["actor"]
-            return [actor["name"] for actor in actors]
+            return ', '.join([actor["name"] for actor in actors])
         except:
             return "(No actors known.)"
 

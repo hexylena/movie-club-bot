@@ -2,7 +2,7 @@ from django.db import models
 import uuid
 from django.utils.timezone import now
 import random
-import hashlib
+import secrets
 import time
 import json
 import isodate
@@ -545,10 +545,11 @@ class Event(models.Model):
 
 class UserData(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_data")
-    secret_hash = models.CharField(max_length=64, default=lambda: hashlib.sha256().hexdigest())
+    secret_hash = models.CharField(max_length=64, default=lambda: secrets.token_urlsafe(32))
 
     def generate_new_hash(self):
-        self.secret_hash = hashlib.sha256().hexdigest()
+        self.secret_hash = secrets.token_urlsafe(32)
+        self.save()
 
     def __str__(self) -> str:
         return f"{self.user.username}"

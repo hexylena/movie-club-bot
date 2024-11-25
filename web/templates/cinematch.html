@@ -17,6 +17,14 @@ CineMatch
                     <div class="h1">CineMatch</div>
                 </div>
 
+                <div class="row">
+                    {% if poster_url %}
+                        <img src="{{ poster_url }}" class="rounded mx-auto d-block" alt="poster">
+                    {% else %}
+                        <div class="h6 text-danger">Could not fetch poster</div>
+                    {% endif %}
+                </div>
+
                 <div class="row">  <!-- meta data -->
                     <div class="col">
                         <div class="row"><a class="h2 text-primary" href="{{ movie.imdb_link }}">{{ movie.title }} ({{ movie.rating }}/{{ movie.ratings }})</a></div>
@@ -26,57 +34,57 @@ CineMatch
                 </div>
 
                 <div class="row">
-                    {% if poster_url %}
-                        <img src="{{ poster_url }}" class="rounded mx-auto d-block" alt="poster">
-                    {% else %}
-                        <div class="h6 text-danger">Could not fetch poster</div>
-                    {% endif %}
-                </div>
-
-                <div class="row">
                     {{ movie.description }}
                 </div>
 
 
                 <div class="row">  <!-- voting -->
-                    <div class="col-sm-2">
+                    <div class="col-sm-6">
+                        <form action="{% url 'cinematch_post' tennant_id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="movie_id" value="{{ movie.pk }}">
+                            <input type="hidden" name="interest" value="-3">
+                            <button class="btn btn-link btn-lg" type="submit">😎 already seen</button>
+                        </form>
+                    </div>
+                    <div class="col-sm-6">
                         <form action="{% url 'cinematch_post' tennant_id %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="movie_id" value="{{ movie.pk }}">
                             <input type="hidden" name="interest" value="-2">
-                            <button class="btn btn-link btn-lg" type="submit">🚫</button>
+                            <button class="btn btn-link btn-lg" type="submit">🚫 veto</button>
                         </form>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-6">
                         <form action="{% url 'cinematch_post' tennant_id %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="movie_id" value="{{ movie.pk }}">
                             <input type="hidden" name="interest" value="-1">
-                            <button class="btn btn-link btn-lg" type="submit">🤬</button>
+                            <button class="btn btn-link btn-lg" type="submit">🤬 cinemacraptastic </button>
                         </form>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-6">
                         <form action="{% url 'cinematch_post' tennant_id %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="movie_id" value="{{ movie.pk }}">
                             <input type="hidden" name="interest" value="0">
-                            <button class="btn btn-link btn-lg" type="submit">🤷</button>
+                            <button class="btn btn-link btn-lg" type="submit">🤷 meh</button>
                         </form>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-6">
                         <form action="{% url 'cinematch_post' tennant_id %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="movie_id" value="{{ movie.pk }}">
                             <input type="hidden" name="interest" value="1">
-                            <button class="btn btn-link btn-lg" type="submit">🆗</button>
+                            <button class="btn btn-link btn-lg" type="submit">🆗 sure </button>
                         </form>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-6">
                         <form action="{% url 'cinematch_post' tennant_id %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="movie_id" value="{{ movie.pk }}">
                             <input type="hidden" name="interest" value="2">
-                            <button class="btn btn-link btn-lg" type="submit">💯</button>
+                            <button class="btn btn-link btn-lg" type="submit">💯 yesss </button>
                         </form>
                     </div>
                 </div>

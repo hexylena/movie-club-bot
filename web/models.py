@@ -231,7 +231,7 @@ class MovieSuggestion(models.Model):
             else:
                 vote_adj = math.log10(self.ratings) * self.rating + year_debuff
 
-            old = self.days_since_added / 20
+            old = self.days_since_added / 200
             # Ensure this is non-zero even if we balance it perfectly.
             interests = (sum([i.score for i in self.interest_set.all()]) + 0.5) / 4
 

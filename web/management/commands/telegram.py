@@ -537,7 +537,7 @@ class Command(BaseCommand):
             if not film.has_user_rated(user_id):
                 bot.send_message(
                     user_id,
-                    f"You haven't rated '{film}' yet. {film.imdb_link}",
+                    f"You haven't rated '{film}' yet. {film.imdb_link}\n\n {film.description}",
                 )
                 self.send_interest_poll(user_id, tennant_id, film)
                 print(f"Sent rerate to {user_id} for {film}")

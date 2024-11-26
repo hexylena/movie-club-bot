@@ -340,6 +340,11 @@ class MovieSuggestion(models.Model):
         return [
             str(i.user)[0].upper() for i in self.interest_set.all() if i.score == -2
         ]
+    @property
+    def get_rated_m3(self):
+        return [
+            str(i.user)[0].upper() for i in self.interest_set.all() if i.score == -3
+        ]
 
     @property
     def imdb_link(self):

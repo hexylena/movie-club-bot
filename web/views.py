@@ -186,7 +186,7 @@ def stats(request, acct):
                 x
                 for (rating, votes, invert_votes, score, x) in
                 sorted([
-                    (x.get_rating, x.get_ourvotes, 5 - x.get_rating, x.get_ourvotes * (5 - x.get_rating), x ) 
+                    (x.get_rating, x.get_ourvotes, 5 - x.get_rating, x.get_ourvotes * (5 - x.get_rating), x )
                     for x in watched.filter(status_changed_date__year=year)
                 ], key=lambda x: x[3])[-6:][::-1]
             ],
@@ -367,7 +367,7 @@ def cinematch(request: HttpRequest, acct: str):
     user = request.user
 
     movies = MovieSuggestion.objects.filter(
-        tennant_id=acct, 
+        tennant_id=acct,
         status=0,
     ).filter(
         ~Q(interest__user__pk__contains=user.pk)
@@ -393,22 +393,22 @@ def cinematch_post(request: HttpRequest, acct: str):
 
     if MovieSuggestion.objects.filter(tennant_id=tennant_id).count() == 0:
         raise Http404("Tennant not found")
-    
+
     movie_id = request.POST.get("movie_id", "")
     movie = get_object_or_404(MovieSuggestion, pk=movie_id)
-    
+
     interest = request.POST.get("interest", "")
     if interest == "":
         raise Http404("Need a vote!")
-    
+
     try:
         interest = int(interest)
     except ValueError as e:
         raise Http404("Not a valid vote!")
-    
-    if interest not in [2, 1, 0 , -1, -2]:
+
+    if interest not in [2, 1, 0 , -1, -2, -3]:
         raise Http404("Sneaky sneaky")
-    
+
     Interest.objects.create(
         tennant_id = tennant_id,
         user=user,

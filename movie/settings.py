@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ["movie-club-bot.app.galaxians.org", "localhost", "127.0.0.1"]
 
 IS_HEROKU = "DYNO" in os.environ
 
+DEBUG = False
 # SECURITY WARNING: don't run with debug turned on in production!
 if not IS_HEROKU:
     DEBUG = True
@@ -63,7 +64,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-if DEBUG and not TESTING:
+if DEBUG:
     INSTALLED_APPS += ["debug_toolbar"]
     MIDDLEWARE += [
         "debug_toolbar.middleware.DebugToolbarMiddleware",

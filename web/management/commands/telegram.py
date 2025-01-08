@@ -230,7 +230,7 @@ class Command(BaseCommand):
     previous_messages = {}
     PROMPTS = {}
     PROMPTS_DALLE = {}
-    CHATTINESS_DEFAULT = (0.025, 0.05)
+    CHATTINESS_DEFAULT = (0.03, 0.005)
     CHATTINESS_ANNOYING = (0.7, 0.1)
     CHATTINESS = {}
     tfm = TimedFactManager()
@@ -961,10 +961,10 @@ class Command(BaseCommand):
             ):
                 self.dalle_context(message.text, message, tennant_id)
 
-            if random.random() < 0.05:
-                rerate_user_id = random.choice(["824932139", "5374276216", "195671723", "15244978", "15244978"])
-                rerate_tennant_id = "-627602564"
-                self.send_rerate_poll(rerate_user_id, rerate_tennant_id)
+            # if random.random() < 0.05:
+            #     rerate_user_id = random.choice(["824932139", "5374276216", "195671723", "15244978", "15244978"])
+            #     rerate_tennant_id = "-627602564"
+            #     self.send_rerate_poll(rerate_user_id, rerate_tennant_id)
 
             # elif random.random() < 0.01:
             #     self.tts_context(message.text, message, tennant_id)

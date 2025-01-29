@@ -211,6 +211,10 @@ class MovieSuggestion(models.Model):
 
     @property
     def get_score(self):
+        return self.get_score_explained[0]
+
+    @property
+    def get_score_explained(self):
         try:
             explained_score = []
 
@@ -230,31 +234,32 @@ class MovieSuggestion(models.Model):
             # Exception for unreleased
             if self.runtime == 0:
                 runtime_debuff = -20 / 10
-                explained_score.append(f'runtime_debuff = -2, set because the runtime was 0 (usually for unreleased films)')
+                explained_score.append(f'runtime_debuff = -2 | set because the runtime was 0 (usually for unreleased films)')
             else:
                 runtime_debuff = -1 * abs(self.runtime - 90) / 10
-                explained_score.append(f'runtime_debuff = {runtime_debuff}')
+                explained_score.append(f'runtime_debuff =  {runtime_debuff} | -1 * abs({runtime_debuff} - 90) / 10')
 
 
             # Exception for unreleased
             if self.ratings == 0:
                 vote_adj = 5 * 5 + year_debuff
-                explained_score.append(f'vote_adj = {vote_adj}, no ratings were available so we choose this number which includes year_debuff={year_debuff} in the calculation.')
+                explained_score.append(f'vote_adj = {vote_adj} | no ratings were available so we choose this number which includes year_debuff={year_debuff} in the calculation.')
             else:
                 vote_adj = math.log10(self.ratings) * self.rating + year_debuff
-                explained_score.append(f'vote_adj = {vote_adj}, log10({self.ratings} (ratings)) * self.rating + year_debuff.')
+                explained_score.append(f'vote_adj = {vote_adj} | log10({self.ratings} (ratings)) * self.rating + year_debuff.')
 
             old = self.days_since_added / 200
             explained_score.append(f'old = {old}, the number of days since it was added, divided by 200')
             # Ensure this is non-zero even if we balance it perfectly.
             interests = (sum([i.score for i in self.interest_set.all()]) + 0.5) / 4
-            explained_score.append(f'interests = {interests}, calculated as (sum({[i.score for i in self.interest_set.all()]}) + 0.5)/4 interest score')
+            explained_score.append(f'interests = {interests} | calculated as (sum({[i.score for i in self.interest_set.all()]}) + 0.5)/4 interest score')
 
-            explained_score.append(f'final_score = round({interests}(interests) * ({runtime_debuff}(runtime_debuff) + {buff_score}(buff_score) + {vote_adj}(vote_adj), 2) - {old}(old)')
-            return round(interests * (runtime_debuff + buff_score + vote_adj), 2) - old, explained_score
+            final_score = round(interests * (runtime_debuff + buff_score + vote_adj), 2) - old
+            explained_score.append(f'final_score = {final_score} | round({interests}(interests) * ({runtime_debuff}(runtime_debuff) + {buff_score}(buff_score) + {vote_adj}(vote_adj), 2) - {old}(old)')
+            return final_score, explained_score
         except:
             # Some things are weird here, dunno why.
-            return 0
+            return 0, []
 
     @property
     def is_jj_interested(self):

@@ -211,9 +211,9 @@ class MovieSuggestion(models.Model):
 
     @property
     def get_score(self):
-        return self.get_score_explained[0]
+        (final_score, _explanation) = self.get_score_explained()
+        return final_score
 
-    @property
     def get_score_explained(self):
         try:
             explained_score = []

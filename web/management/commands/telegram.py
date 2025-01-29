@@ -383,10 +383,11 @@ class Command(BaseCommand):
         return msg
 
     def suggest(self, message):
-        unwatched = sorted(
-            MovieSuggestion.objects.filter(tennant_id=str(message.chat.id), status=0),
-            key=lambda x: -x.get_score,
-        )[0:3]
+        unwatched = self._obtain_suggestions(
+            tennant_id=str(message.chat.id),
+            jj=True,
+            n=3,
+        )
         msg = "Top 3 films to watch:\n\n"
         for film in unwatched:
             msg += film.str_pretty() + "\n"
@@ -438,8 +439,8 @@ class Command(BaseCommand):
 
         unwatched = sorted(
             MovieSuggestion.objects.filter(**args),
-            key=lambda x: (-x.get_score_nojj if jj else -x.get_score),
-        )
+            key=lambda x: (-x.get_score if jj else -x.get_score_nojj),
+        )kk
 
         if not jj:
             unwatched = [x for x in unwatched if not x.is_jj_interested]

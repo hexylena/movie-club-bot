@@ -111,6 +111,9 @@ $(document).ready(function () {
         pagingType: 'full_numbers',
     });
 });
+
+// show score calc
+[...document.querySelectorAll("td[title]")].forEach(n => { n.addEventListener('click', (e) => {alert(e.target.attributes.title.textContent)})})
 </script>
 
 {% endblock %}

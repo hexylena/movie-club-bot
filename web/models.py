@@ -212,30 +212,46 @@ class MovieSuggestion(models.Model):
     @property
     def get_score(self):
         try:
+            explained_score = []
+
             buff_score = sum(
                 [buff.value_adj for buff in self.buffs.all()]
             )  # could be in db.
+
+            explained_score.append(f'buff_score = {buff_score}, this is the summ of any buffs that are applied like +cage.')
+
             if self.year < 1990:
                 year_debuff = -1
+                explained_score.append(f'year_debuff = 1, this movie is older than 1990.')
             else:
                 year_debuff = 0
+                explained_score.append(f'year_debuff = 0, this movie is more recent than 1990.')
 
             # Exception for unreleased
             if self.runtime == 0:
                 runtime_debuff = -20 / 10
+                explained_score.append(f'runtime_debuff = -2, set because the runtime was 0 (usually for unreleased films)')
             else:
                 runtime_debuff = -1 * abs(self.runtime - 90) / 10
+                explained_score.append(f'runtime_debuff = {runtime_debuff}')
+
+
             # Exception for unreleased
-            if self.ratings > 0:
+            if self.ratings == 0:
                 vote_adj = 5 * 5 + year_debuff
+                explained_score.append(f'vote_adj = {vote_adj}, no ratings were available so we choose this number which includes year_debuff={year_debuff} in the calculation.')
             else:
                 vote_adj = math.log10(self.ratings) * self.rating + year_debuff
+                explained_score.append(f'vote_adj = {vote_adj}, log10({self.ratings} (ratings)) * self.rating + year_debuff.')
 
             old = self.days_since_added / 200
+            explained_score.append(f'old = {old}, the number of days since it was added, divided by 200')
             # Ensure this is non-zero even if we balance it perfectly.
             interests = (sum([i.score for i in self.interest_set.all()]) + 0.5) / 4
+            explained_score.append(f'interests = {interests}, calculated as (sum({[i.score for i in self.interest_set.all()]}) + 0.5)/4 interest score')
 
-            return round(interests * (runtime_debuff + buff_score + vote_adj), 2) - old
+            explained_score.append(f'final_score = round({interests}(interests) * ({runtime_debuff}(runtime_debuff) + {buff_score}(buff_score) + {vote_adj}(vote_adj), 2) - {old}(old)')
+            return round(interests * (runtime_debuff + buff_score + vote_adj), 2) - old, explained_score
         except:
             # Some things are weird here, dunno why.
             return 0

@@ -49,7 +49,7 @@ Movie List
 			<td>{{ m.days_since_added }}</td>
 			<td>{{ m.rating }}</td>
 			<td>{{ m.runtime }}</td>
-			<td>{{ m.get_score|floatformat:2 }}</td>
+			<td title="{{ m.get_explanation }}">{{ m.get_score|floatformat:2 }}</td>
 			<td>{{ m.get_buffs }}</td>
 
 			<td>{{ m.get_ourvotes }}</td>

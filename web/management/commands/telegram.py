@@ -440,7 +440,7 @@ class Command(BaseCommand):
         unwatched = sorted(
             MovieSuggestion.objects.filter(**args),
             key=lambda x: (-x.get_score if jj else -x.get_score_nojj),
-        )kk
+        )
 
         if not jj:
             unwatched = [x for x in unwatched if not x.is_jj_interested]

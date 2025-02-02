@@ -478,7 +478,7 @@ class Command(BaseCommand):
                     resp += f"\nWatched on {movie.status_changed_date}"
                     resp += f"\nRating: {movie.get_rating}"
                 else:
-                    resp += f"\nScore: {movie.get_score}"
+                    resp += f"\nScore: {movie.get_score} (#{movie.get_ranking})"
 
                 self.add_context(
                     {

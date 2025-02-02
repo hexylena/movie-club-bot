@@ -215,6 +215,16 @@ class MovieSuggestion(models.Model):
         return final_score
 
     @property
+    def get_ranking(self):
+        unwatched = sorted(
+            MovieSuggestion.objects.filter(tennant_id=self.tennant_id, status=0),
+            key=lambda x: -x.get_score,
+        )
+        for idx, movie in enumerate(unwatched):
+            if movie == self:
+                return idx + 1
+
+    @property
     def get_explanation(self):
         (_final_score, explanation) = self.get_score_explained()
         return "\n".join(explanation)

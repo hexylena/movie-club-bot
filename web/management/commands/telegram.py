@@ -470,7 +470,7 @@ class Command(BaseCommand):
                 movie_details = json.loads(movie.meta)
                 days_ago = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc) - movie.added
 
-                resp = f"Suggested by {movie.suggested_by} on {movie.added.strftime('%B %m, %Y')} ({str(days_ago)})\nVotes: "
+                resp = f"Suggested by {movie.suggested_by} on {movie.added.strftime('%B %d, %Y')} ({str(days_ago)})\nVotes: "
                 for v in movie.interest_set.all():
                     resp += f"{v.score_e}"
 

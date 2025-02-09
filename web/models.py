@@ -266,7 +266,7 @@ class MovieSuggestion(models.Model):
             old = self.days_since_added / 200
             explained_score.append(f'old = {old}, the number of days since it was added, divided by 200')
             # Ensure this is non-zero even if we balance it perfectly.
-            interests = math.pow(sum([i.score for i in self.interest_set.all()]) + 0.5), 2) / 4
+            interests = math.pow(sum([i.score for i in self.interest_set.all()]) + 0.5, 2) / 4
             explained_score.append(f'interests = {interests}^2| calculated as (sum({[i.score for i in self.interest_set.all()]}) + 0.5)^2/4')
 
             final_score = round(interests * (runtime_debuff + buff_score + vote_adj), 2) - old

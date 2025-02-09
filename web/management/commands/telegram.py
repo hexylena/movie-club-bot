@@ -463,7 +463,7 @@ class Command(BaseCommand):
                 # Buff it because someone clearly wants to see it, it's getting
                 # re-pasted in the chat (DNE branch below for new new)
                 user = find_user(message.from_user)
-                repost_buff, _ = Buff.objects.get_or_create(tennant_id=tennant_id, short=f're.{user.username.id}'[0:8],
+                repost_buff, _ = Buff.objects.get_or_create(tennant_id=tennant_id, short=f're.{user.username}'[0:8],
                                                             name=f'reshare-{user.username}', value=15)
                 movie.buffs.add(repost_buff)
                 movie.save()

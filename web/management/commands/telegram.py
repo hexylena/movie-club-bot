@@ -10,17 +10,7 @@ import uuid
 from web.models import UserData
 
 
-from web.models import (
-    CriticRating,
-    Interest,
-    MovieSuggestion,
-    Poll,
-    PollArbitrary,
-    AntiInterest,
-    Event,
-    TelegramGroup,
-    InPersonMovieSuggestion,
-)
+from web.models import *
 
 import datetime
 import json

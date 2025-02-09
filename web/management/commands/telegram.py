@@ -203,7 +203,7 @@ def handle_user_response(response):
 bot.poll_answer_handler(func=lambda call: True)(handle_user_response)
 
 
-def find_user(passed_user):
+def find_user(passed_user: telebot.types.User):
     try:
         ret = User.objects.get(username=passed_user.id)
     except User.DoesNotExist:
@@ -460,7 +460,7 @@ class Command(BaseCommand):
             msg += film.str_pretty() + "\n"
         bot.send_message(message.chat.id, msg)
 
-    def process_imdb_links(self, message):
+    def process_imdb_links(self, message: telebot.types.Message):
         tennant_id = str(message.chat.id)
         new_count = 0
         for m in imdb_link.findall(message.text):

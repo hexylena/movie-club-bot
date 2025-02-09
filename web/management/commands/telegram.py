@@ -466,9 +466,17 @@ class Command(BaseCommand):
         for m in imdb_link.findall(message.text):
             # bot.send_message(message.chat.id, f"Received {m}")
             try:
-                movie = MovieSuggestion.objects.get(tennant_id=tennant_id, imdb_id=m)
+                movie: MovieSuggestion = MovieSuggestion.objects.get(tennant_id=tennant_id, imdb_id=m)
                 movie_details = json.loads(movie.meta)
                 days_ago = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc) - movie.added
+
+                # Buff it because someone clearly wants to see it, it's getting
+                # re-pasted in the chat (DNE branch below for new new)
+                user = find_user(message.from_user)
+                repost_buff, _ = Buff.objects.get_or_create(tennant_id=tennant_id, short=f'reshare-{user.username}',
+                                                            name=f'reshare-{user.username}', value=15)
+                movie.buffs.add(repost_buff)
+                movie.save()
 
                 resp = f"Suggested by {movie.suggested_by} on {movie.added.strftime('%B %d, %Y')} ({str(days_ago)})\nVotes: "
                 for v in movie.interest_set.all():

@@ -83,7 +83,7 @@ class InPersonMovieSuggestion(models.Model):
 
     # dinner_location = models.TextField(null=True)
     # dinner_time = models.CharField(max_length=8)
-    theater_datetime = models.DateTimeField(null=True, blank=True)
+    theater_datetime = models.DateTimeField(null=True, blank=True, help="This *should* be processed as Europe/Amsterdam")
     theater_location = models.CharField(max_length=10, null=True, blank=True)
     showing_type = models.CharField(max_length=10, null=True, blank=True)
 

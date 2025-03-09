@@ -4,6 +4,7 @@ from django.utils.timezone import now
 import random
 import secrets
 import time
+import pytz
 import json
 import isodate
 import datetime
@@ -90,7 +91,9 @@ class InPersonMovieSuggestion(models.Model):
     processed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.title} at {self.theater_datetime.strftime('%A, %H:%M')} in {THEATERS.get(self.theater_location, self.theater_location)}"
+        local_tz = pytz.timezone('Europe/Amsterdam')
+        dt = self.theater_datetime.astimezone(local_tz)
+        return f"{self.title} at {dt.strftime('%A, %H:%M')} in {THEATERS.get(self.theater_location, self.theater_location)}"
 
     @property
     def runtime_f(self):

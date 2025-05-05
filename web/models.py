@@ -447,6 +447,8 @@ class MovieSuggestion(models.Model):
         self.runtime = r_s
         self.genre = g_s
         self.meta = json.dumps(movie_details)
+        if self.tmdb_id is None:
+            self.tmdb_id = get_tmdb_id(self.imdb_id)
         self.imdb_update = now()
         self.save()
 

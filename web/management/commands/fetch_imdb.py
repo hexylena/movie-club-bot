@@ -1,10 +1,9 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import Permission
 from django.utils.timezone import now
+from web.utils import get_tmdb_id
 import time
 import math
 import random
-import re
 import web.models
 import datetime
 
@@ -38,3 +37,27 @@ class Command(BaseCommand):
                 time.sleep(1)
             else:
                 print(f"Skipping {unwatched.title} d={days_since_updated} c={chance}")
+
+
+        for missing_tmdb in web.models.MovieSuggestion.objects.filter(tmdb_id=None):
+            # calculate whether or not to refresh based on age.
+
+            # Generate a % chance to refresh based on age
+            # where 0 days since updated = 0%
+            # 730 days since updated = 50%
+            # Should use a sigmoid.
+
+            if missing_tmdb.imdb_update is None:
+                days_since_updated = 730
+            else:
+                days_since_updated = (now() - missing_tmdb.imdb_update).days
+
+            chance = 1 / (1 + math.exp(-0.01 * (days_since_updated - 730)))
+
+            if random.random() < chance * 10:
+                print(f"Finding missing TMDB ID for {missing_tmdb.title}")
+
+                missing_tmdb.tmdb_id = get_tmdb_id(missing_tmdb.imdb_id)
+                if missing_tmdb.tmdb_id is not None:
+                    missing_tmdb.save()
+                time.sleep(1)

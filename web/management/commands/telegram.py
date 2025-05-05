@@ -477,6 +477,8 @@ class Command(BaseCommand):
                     resp += f"\nRating: {movie.get_rating}"
                 else:
                     resp += f"\nScore: {movie.get_score} (#{movie.get_ranking})"
+                    resp += f"\nProduced in: {movie.e_production_countries}"
+                    resp += f"\nProduced by: {movie.e_production_companies}"
 
                 self.add_context(
                     {
@@ -508,6 +510,9 @@ class Command(BaseCommand):
                         "ratingValue", "n/a"
                     )
                     msg += f"\n👥{rating_count}⭐️{rating_value}"
+                    msg += f"\nProduced in: {movie.e_production_countries}"
+                    msg += f"\nProduced by: {movie.e_production_companies}"
+
                 self.add_context(
                     {
                         "role": "user",

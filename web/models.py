@@ -64,7 +64,7 @@ class Buff(models.Model):
 
 class CompanyInformation(models.Model):
     tmdb_id = models.CharField(max_length=64, primary_key=True)
-    name = models.CharField(max_length=64)
+    name = models.TextField()
     country = models.CharField(max_length=8)
 
     def __str__(self) -> str:
@@ -437,6 +437,22 @@ class MovieSuggestion(models.Model):
             return ', '.join([actor["name"] for actor in actors])
         except:
             return "(No actors known.)"
+
+    @property
+    def e_production_countries(self):
+        flags = []
+        for country in self.production_countries.all():
+            if country.iso != '':
+                flags.append(flag2uni(country.iso))
+        return ''.join(flags)
+
+    @property
+    def e_production_companies(self):
+        flags = []
+        for company in self.production_companies.all():
+            if company.country != '':
+                flags.append(flag2uni(company.country))
+        return ''.join(flags)
 
     @property
     def get_countries(self):

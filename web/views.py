@@ -266,6 +266,8 @@ def stats(request, acct):
 
         suggestions_year = suggestions.filter(added__year=year)
         genres = collections.Counter()
+        countries = collections.Counter()
+        companies = collections.Counter()
 
         for s in suggestions_year:
             g = s.genre
@@ -282,10 +284,32 @@ def stats(request, acct):
 
             for genre in genre_list:
                 genres[genre] += 1
+
+            for c in s.production_countries.all():
+                countries[flag2uni(c.iso)] += 1
+
+            for c in s.production_companies.all():
+                z = c.name
+                if c.country != '':
+                    z += ' ' + flag2uni(c.country)
+                companies[z] += 1
+
         q = list(genres.most_common(1))[0][1]
         years[year]['genres'] = [
             (k, v / q)
             for (k, v)  in list(genres.most_common(5))
+        ]
+
+        q = list(countries.most_common(1))[0][1]
+        years[year]['countries'] = [
+            (k, v / q)
+            for (k, v)  in list(countries.most_common(5))
+        ]
+
+        q = list(companies.most_common(1))[0][1]
+        years[year]['companies'] = [
+            (k, v / q)
+            for (k, v)  in list(companies.most_common(5))
         ]
 
 

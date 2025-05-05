@@ -20,7 +20,7 @@ Stats
 
 <div class="row">
 	<!-- card -->
-	<div class="col-sm-6 col-md-4">
+	<div class="col-md-12 col-lg-6 col-xl-4">
 		<div class="card">
 			<div class="card-body">
 				<h3 class="card-title">List Changes</h3>
@@ -74,12 +74,14 @@ Stats
 		{% endfor %}
 	</tbody>
 </table>
+
+
 				</p>
 			</div>
 		</div>
 	</div>
 
-	<div class="col-sm-6 col-md-4">
+	<div class="col-md-12 col-lg-6 col-xl-4">
 		<div class="card">
 			<div class="card-body">
 				<h3 class="card-title">Top Rated Films</h3>
@@ -107,7 +109,7 @@ Stats
 		</div>
 	</div>
 
-	<div class="col-sm-6 col-md-4">
+	<div class="col-md-12 col-lg-6 col-xl-4">
 		<div class="card">
 			<div class="card-body">
 				<h3 class="card-title">Biggest Disappointments</h3>
@@ -137,7 +139,7 @@ Stats
 	</div>
 
 	{% if data.start_times %}
-	<div class="col-sm-6 col-md-4">
+	<div class="col-md-12 col-lg-6 col-xl-4">
 		<div class="card">
 			<div class="card-body">
 				<h3 class="card-title">Movie Start Time</h3>
@@ -184,6 +186,65 @@ Stats
 		</div>
 	</div>
 	{% endif %}
+
+
+	<div class="col-md-12 col-lg-6 col-xl-4">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title">Production Countries</h3>
+				<p class="card-text">
+
+<table class="charts-css bar show-labels show-4-secondary-axes">
+	<thead>
+		<tr>
+			<th scope="col"> Country </th> <th scope="col"> Count </th></tr>
+	</thead>
+	<tbody>
+		{% for country in data.countries %}
+		<tr>
+			<th scope="row"> {{ country.0 }} </th>
+			<td style="--size:{{ country.1 }};"></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+				</p>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="col-md-12 col-lg-6 col-xl-4">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title">Production Companies</h3>
+				<p class="card-text">
+
+<table class="charts-css bar show-labels show-4-secondary-axes">
+	<thead>
+		<tr>
+			<th scope="col"> Company </th> <th scope="col"> Count </th></tr>
+	</thead>
+	<tbody>
+		{% for company in data.companies %}
+		<tr>
+			<th style="width:40em" scope="row"> {{ company.0 }} </th>
+			<td style="--size:{{ company.1 }};"></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+				</p>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
 </div>
 
 

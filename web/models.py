@@ -68,7 +68,7 @@ class TelegramGroup(models.Model):
 class InPersonMovieSuggestion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     imdb_id = models.CharField(max_length=64)
-    tmdb_id = models.IntegerField()
+    tmdb_id = models.IntegerField(null=True, blank=True)
     tennant_id = models.CharField(max_length=64)
 
     # Meta
@@ -161,7 +161,7 @@ class InPersonMovieSuggestion(models.Model):
 class MovieSuggestion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     imdb_id = models.CharField(max_length=64)
-    tmdb_id = models.IntegerField()
+    tmdb_id = models.IntegerField(null=True, blank=True)
     tennant_id = models.CharField(max_length=64)
 
     # Meta

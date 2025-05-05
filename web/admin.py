@@ -75,3 +75,9 @@ class UserDataAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(UserData, UserDataAdmin)
+
+
+class CompanyInformationAdmin(admin.ModelAdmin):
+    list_display = ("tmdb_id", "name", "country")
+
+admin.site.register(CompanyInformation, CompanyInformationAdmin)

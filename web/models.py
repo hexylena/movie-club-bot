@@ -607,12 +607,15 @@ class Event(models.Model):
     added = models.DateTimeField(auto_now_add=True)
     value = models.TextField()
 
+def get_token():
+    return secrets.token_urlsafe(32)
+
 class UserData(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_data")
-    secret_hash = models.CharField(max_length=64, default=lambda: secrets.token_urlsafe(32))
+    secret_hash = models.CharField(max_length=64, default=get_token)
 
     def generate_new_hash(self):
-        self.secret_hash = secrets.token_urlsafe(32)
+        self.secret_hash = get_token()
         self.save()
 
     def __str__(self) -> str:

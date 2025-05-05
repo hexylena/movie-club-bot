@@ -487,7 +487,7 @@ class MovieSuggestion(models.Model):
             for c in i['production_countries']:
                 p, _ = ProductionCountry.objects.get_or_create(iso=c['iso_3166_1'], name=c['name'])
                 countries.append(p)
-            self.production_countries = countries
+            self.production_countries.set(countries)
 
         if 'production_companies' in i:
             companies = []
@@ -495,7 +495,7 @@ class MovieSuggestion(models.Model):
                 p, _ = CompanyInformation.objects.get_or_create(
                         tmdb_id=c['id'], name=c['name'], country=c['origin_country'])
                 companies.append(p)
-            self.production_companies = companies
+            self.production_companies.set(companies)
 
         self.tmdb_update = now()
         self.save()

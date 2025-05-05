@@ -30,6 +30,7 @@ Movie List
 			<th>🤬</th>
 			<th>🚫</th>
 			<th>😎</th>
+			<th>Countries</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -59,6 +60,7 @@ Movie List
 			<td>{{ m.get_rated_m1 | join:',' }}</td>
 			<td>{{ m.get_rated_m2 | join:',' }}</td>
 			<td>{{ m.get_rated_m3 | join:',' }}</td>
+			<td>{{ m.get_countries | safe }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>

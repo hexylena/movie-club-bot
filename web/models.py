@@ -28,6 +28,14 @@ SHOWING_TYPES = {
     'dolby': 'Dolby™',
 }
 
+FLAG_UNI = dict(zip(
+    'ABCDEFGHJIKLMNOPQRSTUVWXYZ',
+    '🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶🇷🇸🇹🇺🇻🇼🇽🇾🇿'
+))
+
+def flag2uni(iso_2):
+    return f'{FLAG_UNI[iso_2[0]]}{FLAG_UNI[iso_2[1]]}'
+
 # Monkey patch, yikes.
 User.__str__ = lambda self: self.first_name if self.first_name else self.username
 
@@ -429,6 +437,24 @@ class MovieSuggestion(models.Model):
             return ', '.join([actor["name"] for actor in actors])
         except:
             return "(No actors known.)"
+
+    @property
+    def get_countries(self):
+        flags = []
+        for country in self.production_countries.all():
+            if country.iso != '':
+                flags.append(
+                    f'<span title="Produced in {country.name}">{flag2uni(country.iso)}</span>'
+                )
+
+        for company in self.production_companies.all():
+            if company.country != '':
+                flags.append(
+                    f'<span title="{company.name}">{flag2uni(company.country)}</span>'
+                )
+
+        return ''.join(flags)
+
 
     def update_from_imdb(self):
         movie_details = get_ld_json(f"https://www.imdb.com/title/{self.imdb_id}/")

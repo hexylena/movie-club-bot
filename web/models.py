@@ -10,7 +10,7 @@ import isodate
 import datetime
 import math
 from django.contrib.auth.models import User
-from web.utils import get_ld_json
+from web.utils import get_ld_json, get_tmdb_id
 
 THEATERS = {
     'spui': 'Pathé Spuimarkt, Den Haag',
@@ -68,6 +68,7 @@ class TelegramGroup(models.Model):
 class InPersonMovieSuggestion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     imdb_id = models.CharField(max_length=64)
+    tmdb_id = models.IntegerField()
     tennant_id = models.CharField(max_length=64)
 
     # Meta
@@ -130,6 +131,9 @@ class InPersonMovieSuggestion(models.Model):
         self.genre = g_s
         self.meta = json.dumps(movie_details)
         self.imdb_update = now()
+        # Try and update it.
+        if self.tmdb_id is None:
+            self.tmdb_id = get_tmdb_id(self.imdb_id)
         self.save()
 
     @property
@@ -157,6 +161,7 @@ class InPersonMovieSuggestion(models.Model):
 class MovieSuggestion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     imdb_id = models.CharField(max_length=64)
+    tmdb_id = models.IntegerField()
     tennant_id = models.CharField(max_length=64)
 
     # Meta
@@ -487,9 +492,11 @@ class MovieSuggestion(models.Model):
         elif 'Nicholas Cage' in json_movie_details:
             cagefactor = True
 
+        tmdb_id = get_tmdb_id(imdb_id)
         movie = cls(
             # IMDB Metadata
             imdb_id=imdb_id,
+            tmdb_id=tmdb_id,
             tennant_id=tennant_id,
             title=movie_details["name"].replace("&apos;", "'"),
             year=y_s,
@@ -608,3 +615,20 @@ class UserData(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username}"
+
+class CompanyInformation(models.Model):
+    tmdb_id = models.CharField(max_length=64, primary_key=True)
+
+    name = models.CharField(max_length=64)
+    country = models.CharField(max_length=8)
+
+    def __str__(self) -> str:
+        return f"{self.name} [{self.country}]"
+
+    @classmethod
+    def from_tmdb(cls, imdb_co_id):
+        try:
+            return cls.objects.get(id=imdb_co_id)
+        except cls.DoesNotExist:
+            pass
+

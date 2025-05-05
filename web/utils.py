@@ -1,5 +1,6 @@
 import json
 
+from typing import Optional
 import requests
 from bs4 import BeautifulSoup
 import tmdbsimple as tmdb
@@ -27,3 +28,18 @@ def get_movie_poster_url_from_tmdb(movie) -> str | None:
         return f"https://image.tmdb.org/t/p/w500{poster_path}"
     except Exception as _:
         return None
+
+def get_tmdb_id(imdb_id) -> Optional[int]:
+    try:
+        tmdb_results = tmdb.Find(imdb_id).info(external_source="imdb_id")
+        return tmdb_results["movie_results"][0]["id"]
+    except Exception as _:
+        print(f"Could not find TMDB ID for {imdb_id}")
+        return None
+
+
+# def get_company_details(co_id) -> str | None:
+#     try:
+#         data = requests.get("https://pro.imdb.com/company/{co_id}")
+#     except Exception as _:
+#         return None

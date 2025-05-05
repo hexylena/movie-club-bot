@@ -303,13 +303,13 @@ def stats(request, acct):
         q = list(countries.most_common(1))[0][1]
         years[year]['countries'] = [
             (k, v / q)
-            for (k, v)  in list(countries.most_common(5))
+            for (k, v)  in list(countries.most_common(15))
         ]
 
         q = list(companies.most_common(1))[0][1]
         years[year]['companies'] = [
             (k, v / q)
-            for (k, v)  in list(companies.most_common(5))
+            for (k, v)  in list(companies.most_common(15))
         ]
 
 

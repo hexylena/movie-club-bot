@@ -289,8 +289,8 @@ class MovieSuggestion(models.Model):
                 runtime_debuff = -1 * abs(self.runtime - 90) / 10
                 explained_score.append(f'runtime_debuff =  {runtime_debuff} | -1 * abs({runtime_debuff} - 90) / 10')
 
-            tariffs = (1 - min(self.percent_american, 0.9) /  5)
-            explained_score.append(f'tariffs = {tariffs} | (1 - min({self.percent_american}, 0.9) / 5)')
+            tariffs = (1 - min(self.percent_american, 0.9) /  3)
+            explained_score.append(f'tariffs = {tariffs} | (1 - min({self.percent_american}, 0.9) / 4)')
 
             # Exception for unreleased
             if self.ratings == 0:

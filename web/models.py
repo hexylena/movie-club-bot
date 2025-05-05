@@ -289,6 +289,8 @@ class MovieSuggestion(models.Model):
                 runtime_debuff = -1 * abs(self.runtime - 90) / 10
                 explained_score.append(f'runtime_debuff =  {runtime_debuff} | -1 * abs({runtime_debuff} - 90) / 10')
 
+            tariffs = (1 - min(self.percent_american, 0.9))
+            explained_score.append(f'tariffs = {tariffs} | (1 - min({self.percent_american}, 0.9))')
 
             # Exception for unreleased
             if self.ratings == 0:
@@ -304,10 +306,10 @@ class MovieSuggestion(models.Model):
             interests = (sum([i.score for i in self.interest_set.all()]) + 0.5) / 4
             explained_score.append(f'interests = {interests} | calculated as (sum({[i.score for i in self.interest_set.all()]}) + 0.5)/4 interest score')
 
-            final_score = round(interests * (runtime_debuff + buff_score + vote_adj), 2) - old
-            explained_score.append(f'final_score = {final_score} | round({interests}(interests) * ({runtime_debuff}(runtime_debuff) + {buff_score}(buff_score) + {vote_adj}(vote_adj)), 2 - {old}(old)')
-            explained_score.append(f'final_score = {final_score} | round({interests}(interests) * ({runtime_debuff + buff_score + vote_adj}), 2) - {old}(old)')
-            explained_score.append(f'final_score = {final_score} | round({interests * (runtime_debuff + buff_score + vote_adj)}, 2) - {old}')
+            final_score = round(interests * tariffs * (runtime_debuff + buff_score + vote_adj), 2) - old
+            explained_score.append(f'final_score = {final_score} | round({interests}(interests) * {tariffs}(tariffs) * ({runtime_debuff}(runtime_debuff) + {buff_score}(buff_score) + {vote_adj}(vote_adj)), 2 - {old}(old)')
+            explained_score.append(f'final_score = {final_score} | round({interests}(interests) * {tariffs}(tariffs) * ({runtime_debuff + buff_score + vote_adj}), 2) - {old}(old)')
+            explained_score.append(f'final_score = {final_score} | round({interests * tariffs * (runtime_debuff + buff_score + vote_adj)}, 2) - {old}')
             return final_score, explained_score
         except:
             # Some things are weird here, dunno why.
@@ -453,6 +455,18 @@ class MovieSuggestion(models.Model):
             if company.country != '':
                 flags.append(flag2uni(company.country))
         return ''.join(flags)
+
+    @property
+    def percent_american(self):
+        american = 0
+        total = 0
+        for co in self.production_companies.all():
+            if co.country  == 'US':
+                american += 1
+            total += 1
+        if total == 0:
+            return 0
+        return american / total
 
     @property
     def get_countries(self):

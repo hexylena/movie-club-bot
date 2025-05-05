@@ -4,7 +4,6 @@ from typing import Optional
 import requests
 from bs4 import BeautifulSoup
 import tmdbsimple as tmdb
-
 from movie.settings import TMDB_API_KEY
 
 tmdb.API_KEY = TMDB_API_KEY
@@ -37,9 +36,5 @@ def get_tmdb_id(imdb_id) -> Optional[int]:
         print(f"Could not find TMDB ID for {imdb_id}")
         return None
 
-
-# def get_company_details(co_id) -> str | None:
-#     try:
-#         data = requests.get("https://pro.imdb.com/company/{co_id}")
-#     except Exception as _:
-#         return None
+def get_tmdb(tmdb_id):
+    return tmdb.Movies(tmdb_id)

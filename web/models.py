@@ -10,7 +10,7 @@ import isodate
 import datetime
 import math
 from django.contrib.auth.models import User
-from web.utils import get_ld_json, get_tmdb_id
+from web.utils import get_ld_json, get_tmdb_id, get_tmdb
 
 THEATERS = {
     'spui': 'Pathé Spuimarkt, Den Haag',
@@ -53,6 +53,21 @@ class Buff(models.Model):
             return f"-{self.short}"
         else:
             return f"+{self.short}"
+
+class CompanyInformation(models.Model):
+    tmdb_id = models.CharField(max_length=64, primary_key=True)
+    name = models.CharField(max_length=64)
+    country = models.CharField(max_length=8)
+
+    def __str__(self) -> str:
+        return f"{self.name} [{self.country}]"
+
+class ProductionCountry(models.Model):
+    iso = models.CharField(max_length=4, primary_key=True)
+    name = models.TextField()
+
+    def __str__(self) -> str:
+        return f"{self.iso} [{self.name}]"
 
 
 class TelegramGroup(models.Model):
@@ -173,9 +188,13 @@ class MovieSuggestion(models.Model):
     genre = models.TextField(null=True, blank=True)
     meta = models.TextField(null=True)
 
+    production_countries = models.ManyToManyField(ProductionCountry, blank=True)
+    production_companies = models.ManyToManyField(CompanyInformation, blank=True)
+
     added = models.DateTimeField(auto_now_add=True)
     # When was it last updated from IMDB, may be null
     imdb_update = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    tmdb_update = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     # Our info
     status = models.IntegerField()
@@ -452,6 +471,35 @@ class MovieSuggestion(models.Model):
         self.imdb_update = now()
         self.save()
 
+    def update_from_tmdb(self):
+        if self.tmdb_id is None:
+            self.tmdb_id = get_tmdb_id(self.imdb_id)
+
+        # If still not available, exit.
+        if self.tmdb_id is None:
+            return
+
+        m = get_tmdb(self.tmdb_id)
+        i = m.info()
+
+        if 'production_countries' in i:
+            countries = []
+            for c in i['production_countries']:
+                p, _ = ProductionCountry.objects.get_or_create(iso=c['iso_3166_1'], name=c['name'])
+                countries.append(p)
+            self.production_countries = countries
+
+        if 'production_companies' in i:
+            companies = []
+            for c in i['production_companies']:
+                p, _ = CompanyInformation.objects.get_or_create(
+                        tmdb_id=c['id'], name=c['name'], country=c['origin_country'])
+                companies.append(p)
+            self.production_companies = companies
+
+        self.tmdb_update = now()
+        self.save()
+
     @classmethod
     def from_imdb(cls, tennant_id, imdb_id):
         try:
@@ -620,20 +668,3 @@ class UserData(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username}"
-
-class CompanyInformation(models.Model):
-    tmdb_id = models.CharField(max_length=64, primary_key=True)
-
-    name = models.CharField(max_length=64)
-    country = models.CharField(max_length=8)
-
-    def __str__(self) -> str:
-        return f"{self.name} [{self.country}]"
-
-    @classmethod
-    def from_tmdb(cls, imdb_co_id):
-        try:
-            return cls.objects.get(id=imdb_co_id)
-        except cls.DoesNotExist:
-            pass
-

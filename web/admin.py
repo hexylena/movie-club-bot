@@ -81,3 +81,8 @@ class CompanyInformationAdmin(admin.ModelAdmin):
     list_display = ("tmdb_id", "name", "country")
 
 admin.site.register(CompanyInformation, CompanyInformationAdmin)
+
+class ProductionCountryAdmin(admin.ModelAdmin):
+    list_display = ("iso", "name")
+
+admin.site.register(ProductionCountry, ProductionCountryAdmin)

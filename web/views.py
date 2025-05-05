@@ -446,3 +446,60 @@ def static_file(request, path):
     if not re.match(r'^[0-9.-]+$', path):
         return HttpResponse(status=404)
     return HttpResponse(open(os.path.join(settings.MEDIA_ROOT, path + '.png'), 'rb').read(), content_type="image/png")
+
+def country(request, acct):
+    template = loader.get_template("list_by_country.html")
+    try:
+        tg = TelegramGroup.objects.get(tennant_id=str(acct))
+    except:
+        tg = "¿NO SE?"
+        pass
+
+    suggestions = MovieSuggestion.objects.all() \
+        .prefetch_related('production_countries')
+
+    countries = {}
+    for s in suggestions:
+        for c in s.production_countries.all():
+            k = c.name + " " + flag2uni(c.iso)
+            if k not in countries:
+                countries[k] = []
+            countries[k].append(s)
+
+
+    context = {
+        "countries": countries.items(),
+        "tennant_id": acct,
+        "tg": tg,
+    }
+    return HttpResponse(template.render(context, request))
+
+def company(request, acct):
+    template = loader.get_template("list_by_company.html")
+    try:
+        tg = TelegramGroup.objects.get(tennant_id=str(acct))
+    except:
+        tg = "¿NO SE?"
+        pass
+
+    suggestions = MovieSuggestion.objects.all() \
+        .prefetch_related('production_companies')
+
+    countries = {}
+    for s in suggestions:
+        for c in s.production_companies.all():
+            if c.country != '':
+                k = c.name + " " + flag2uni(c.country)
+            else:
+                k = c.name
+            if k not in countries:
+                countries[k] = []
+            countries[k].append(s)
+
+
+    context = {
+        "companies": countries.items(),
+        "tennant_id": acct,
+        "tg": tg,
+    }
+    return HttpResponse(template.render(context, request))

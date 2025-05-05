@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Movies by Production Companies
+{% endblock %}
+
+{% block breadcrumbs %}
+	<li class="nav-item">
+		<span class="nav-link active">{{ tg }}</span>
+	</li>
+{% endblock %}
+
+{% block content %}
+<h1>Production Companies</h1>
+
+{% for c in companies %}
+<h2>{{ c.0 }}</h2>
+<table class="table table-striped display" id="movieTable">
+	<thead>
+		<tr>
+			<th>Title</th>
+			<th>Year</th>
+			<th>Suggested By</th>
+			<th>Days Since Added</th>
+			<th>IMDB rating</th>
+			<th>Runtime</th>
+			<th>Score</th>
+			<th>Buffs</th>
+			<th>Ratings</th>
+			<th>💯</th>
+			<th>🆗</th>
+			<th>🤷</th>
+			<th>🤬</th>
+			<th>🚫</th>
+			<th>😎</th>
+			<th>Countries</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for m in c.1 %}
+		<tr>
+			<td>
+				<a href="https://www.imdb.com/title/{{ m.imdb_id }}/">
+				{{ m.title }}
+				</a>
+			</td>
+			<td>{{ m.year }}</td>
+			<td>
+				{% if m.suggested_by %}
+				<a href="{% url 'profile' m.suggested_by.username %}">{{ m.suggested_by.first_name }}</a>
+				{% endif %}
+			</td>
+			<td>{{ m.days_since_added }}</td>
+			<td>{{ m.rating }}</td>
+			<td>{{ m.runtime }}</td>
+			<td title="{{ m.get_explanation }}">{{ m.get_score|floatformat:2 }}</td>
+			<td>{{ m.get_buffs }}</td>
+
+			<td>{{ m.get_ourvotes }}</td>
+			<td>{{ m.get_rated_2 | join:',' }}</td>
+			<td>{{ m.get_rated_1 | join:',' }}</td>
+			<td>{{ m.get_rated_0 | join:',' }}</td>
+			<td>{{ m.get_rated_m1 | join:',' }}</td>
+			<td>{{ m.get_rated_m2 | join:',' }}</td>
+			<td>{{ m.get_rated_m3 | join:',' }}</td>
+			<td>{{ m.get_countries | safe }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endfor %}
+
+<script>
+$(document).ready(function () {
+    $('#movieTable').DataTable({
+        "pageLength": 25,
+        order: [[6, 'desc']],
+        pagingType: 'full_numbers',
+    });
+});
+
+$(document).ready(function () {
+    $('#watchedTable').DataTable({
+        "pageLength": 25,
+        order: [[2, 'desc']],
+        pagingType: 'full_numbers',
+    });
+});
+
+// show score calc
+[...document.querySelectorAll("td[title]")].forEach(n => { n.addEventListener('click', (e) => {alert(e.target.attributes.title.textContent)})})
+</script>
+
+{% endblock %}

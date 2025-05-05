@@ -10,6 +10,8 @@ def trigger_error(request):
 urlpatterns = [
     path("", views.tennant_list, name="home"),
     path("t/<acct>", views.index, name="index"),
+    path("t/<acct>/by/country", views.country, name="country"),
+    path("t/<acct>/by/company", views.company, name="company"),
     path("u/<acct>", views.profile, name="profile"),
     path("t/<acct>/stats", views.stats, name="stats"),
     path("t/<acct>/irl", views.irl_movie, name="irl"),
